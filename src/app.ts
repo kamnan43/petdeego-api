@@ -14,7 +14,9 @@ import { di } from './di';
 import { config } from './config';
 import { mongodb } from './mongodb';
 
-//import { router as auth } from './routers/auth';
+import { router as order } from './routers/order';
+import { router as quotation } from './routers/quotation';
+import { router as driver } from './routers/driver';
 
 startServer();
 
@@ -91,8 +93,9 @@ async function startServer() {
     const router = express.Router();
     checkTokenExpired(router, 'TOKEN_EXPIRED');
 
-    //app.use('/v1/auth', middleware, auth);
-    // router.use('/roles', role);
+    app.use('/api/v1/order', order);
+    app.use('/api/v1/quotation', quotation);
+    app.use('/api/v1/driver', driver);
 
     return router;
   };
