@@ -10,7 +10,19 @@ router.post('/', createOrder);
 export async function getOrder(req, res, next) {
   let response = undefined;
   try {
-    response = resp({ result: 'success' }, 200);
+    let { userid, orderid } = req.params;
+    let criteria = {
+      'user_id': userid,
+      'order_id': orderid,
+    };
+    let db = di.get('db');
+    let collection = db.collection('orders');
+    const data = await collection.find(criteria).sort().toArray();
+    if (data) {
+      response = resp(data);
+    } else {
+      throw new Error('DATA_NOT_FOUND');
+    }
   } catch (err) {
     console.log('err', err);
     response = resp({ message: err.message }, 400);
@@ -19,7 +31,6 @@ export async function getOrder(req, res, next) {
 }
 
 export async function createOrder(req, res, next) {
-  console.log('body ====> ', req.body);
   let response = undefined;
   try {
     let { body } = req;
