@@ -1,4 +1,16 @@
 export function templateQuotation(order) {
+
+  let petType = '';
+  if (order.pet_type && order.pet_type.length) {
+    order.pet_type.forEach(element => {
+      if (element === 'cat') {
+        petType += ' แมว';
+      } else if (element === 'dog') {
+        petType += ' สุนัข';
+      }
+    });
+  }
+
   let template = {
     type: 'flex',
     altText: 'Flex Message',
@@ -37,10 +49,6 @@ export function templateQuotation(order) {
             layout: 'vertical',
             spacing: 'sm',
             margin: 'lg',
-            action: {
-              type: 'uri',
-              uri: `${order.source.address}`
-            },
             contents: [
               {
                 type: 'box',
@@ -56,7 +64,7 @@ export function templateQuotation(order) {
                   },
                   {
                     type: 'text',
-                    text: `${order.source.address}`,
+                    text: `${order.source.address || '-'}`,
                     flex: 4,
                     size: 'sm',
                     color: '#666666',
@@ -82,7 +90,7 @@ export function templateQuotation(order) {
                   },
                   {
                     type: 'text',
-                    text: `${order.destination.address}`,
+                    text: `${order.destination.address || '-'}`,
                     flex: 4,
                     size: 'sm',
                     color: '#666666',
@@ -108,7 +116,28 @@ export function templateQuotation(order) {
                   },
                   {
                     type: 'text',
-                    text: `${order.date / order.time}`,
+                    text: `${order.date || '-'} / ${order.time || '-'} `,
+                    flex: 5,
+                    size: 'sm',
+                    color: '#666666'
+                  }
+                ]
+              },
+              {
+                type: 'box',
+                layout: 'baseline',
+                spacing: 'sm',
+                contents: [
+                  {
+                    type: 'text',
+                    text: 'ชำระเงิน',
+                    flex: 2,
+                    size: 'sm',
+                    color: '#AAAAAA'
+                  },
+                  {
+                    type: 'text',
+                    text: `${order.payment === 'cash' ? 'เงินสด' : 'Line Pay'}`,
                     flex: 5,
                     size: 'sm',
                     color: '#666666'
@@ -126,10 +155,6 @@ export function templateQuotation(order) {
             layout: 'vertical',
             spacing: 'sm',
             margin: 'lg',
-            action: {
-              type: 'uri',
-              uri: 'https://www.google.com/maps/place/Mo+Chit/@13.8022907,100.5516423,17z/data=!3m1!4b1!4m5!3m4!1s0x30e29c407402e1f1:0x43e7df6aa354257f!8m2!3d13.8022855!4d100.553831'
-            },
             contents: [
               {
                 type: 'box',
@@ -145,7 +170,7 @@ export function templateQuotation(order) {
                   },
                   {
                     type: 'text',
-                    text: `${order.pet_type}`,
+                    text: `${petType || '-'}`,
                     flex: 5,
                     size: 'sm',
                     color: '#666666'
@@ -166,7 +191,7 @@ export function templateQuotation(order) {
                   },
                   {
                     type: 'text',
-                    text: `${order.qty}`,
+                    text: `${order.qty || '-'}`,
                     flex: 5,
                     size: 'sm',
                     color: '#666666'
@@ -187,7 +212,7 @@ export function templateQuotation(order) {
                   },
                   {
                     type: 'text',
-                    text: `${order.sizes}`,
+                    text: `${order.sizes || '-'}`,
                     flex: 5,
                     size: 'sm',
                     color: '#666666'
@@ -219,7 +244,7 @@ export function templateQuotation(order) {
                   },
                   {
                     type: 'text',
-                    text: `${order.customer.phone}`,
+                    text: `${order.customer.phone || '-'}`,
                     flex: 5,
                     size: 'sm',
                     color: '#666666'

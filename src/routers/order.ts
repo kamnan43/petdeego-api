@@ -13,22 +13,20 @@ router.get('/update/:orderid/:status', updateOrderStatus);
 
 async function sendOrderToDriver(order) {
   const db = di.get('db');
-  const option = {
-    pet_type: {
-      $in: [order.pet_type],
-    },
-  };
-const drivers = await db.collection('drivers').find(option).toArray();
+  const drivers = await db.collection('drivers').find({}).toArray();
 
-console.log('drivers ====> ', drivers);
-drivers.forEach(async (driver) => {
-  const message = await templateQuotation(order);
-  pushMessage(driver.user_id, message)
-    .catch((err) => {
-      console.log('err', err.originalError.response.data);
-    });
-});
-return drivers.length;
+  console.log('order =====> ', order);
+  console.log('drivers ====> ', drivers);
+  drivers.forEach(async (driver) => {
+    const message = await templateQuotation(order);
+
+    console.log('message ===> ', JSON.stringify(message));
+    pushMessage(driver.user_id, message)
+      .catch((err) => {
+        console.log('err', err.originalError.response.data);
+      });
+  });
+  return drivers.length;
 }
 
 export async function getOrder(req, res, next) {
