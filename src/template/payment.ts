@@ -1,4 +1,4 @@
-function paymentTemplate(order, driver) {
+export function paymentTemplate(order, driver) {
   let template = {
     type: 'bubble',
     hero: {
