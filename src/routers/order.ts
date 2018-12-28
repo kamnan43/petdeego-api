@@ -1,11 +1,14 @@
 import * as express from 'express';
 import { di } from '../di';
 import { resp } from '../utils/resp';
+import { manager } from '../manager/manager';
+const { ObjectId } = require('mongodb');
 
 export const router = express.Router();
 
 router.get('/', getOrder);
 router.post('/', createOrder);
+router.post('/update', updateOrderStatus);
 
 export async function getOrder(req, res, next) {
   let response = undefined;
@@ -37,6 +40,19 @@ export async function createOrder(req, res, next) {
     let db = di.get('db');
     let collection = db.collection('orders');
     await collection.insertOne(body);
+    response = resp({ result: 'success' }, 200);
+  } catch (err) {
+    console.log('err', err);
+    response = resp({ message: err.message }, 400);
+  }
+  next(response);
+}
+
+export async function updateOrderStatus(req, res, next) {
+  let response = undefined;
+  try {
+    let { body } = req;
+    await manager.order.updateOrderStatus(body.order_id, body.status);
     response = resp({ result: 'success' }, 200);
   } catch (err) {
     console.log('err', err);
