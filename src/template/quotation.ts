@@ -37,10 +37,6 @@ export function templateQuotation(order) {
             layout: 'vertical',
             spacing: 'sm',
             margin: 'lg',
-            action: {
-              type: 'uri',
-              uri: `${order.source.address}`
-            },
             contents: [
               {
                 type: 'box',
@@ -109,6 +105,27 @@ export function templateQuotation(order) {
                   {
                     type: 'text',
                     text: `${order.date / order.time}`,
+                    flex: 5,
+                    size: 'sm',
+                    color: '#666666'
+                  }
+                ]
+              },
+              {
+                type: 'box',
+                layout: 'baseline',
+                spacing: 'sm',
+                contents: [
+                  {
+                    type: 'text',
+                    text: 'ชำระเงิน',
+                    flex: 2,
+                    size: 'sm',
+                    color: '#AAAAAA'
+                  },
+                  {
+                    type: 'text',
+                    text: `${order.payment === 'cash' ? 'เงินสด' : 'Line Pay'}`,
                     flex: 5,
                     size: 'sm',
                     color: '#666666'
