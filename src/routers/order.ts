@@ -19,6 +19,8 @@ async function sendOrderToDriver(order) {
   console.log('drivers ====> ', drivers);
   drivers.forEach(async (driver) => {
     const message = await templateQuotation(order);
+
+    console.log('message ===> ', JSON.stringify(message));
     pushMessage(driver.user_id, message)
       .catch((err) => {
         console.log('err', err.originalError.response.data);
