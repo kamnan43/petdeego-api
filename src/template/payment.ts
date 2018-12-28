@@ -1,6 +1,5 @@
-
-function confirmQuotation (order, driver) {
-  const template = {
+function paymentTemplate(order, driver) {
+  let template = {
     type: 'bubble',
     hero: {
       type: 'image',
@@ -69,27 +68,15 @@ function confirmQuotation (order, driver) {
           type: 'button',
           action: {
             type: 'uri',
-            label: 'รับข้อเสนอ',
+            label: 'ชำระเงิน',
             uri: 'https://linecorp.com'
           },
-          flex: 2,
-          color: '#00d5ca',
-          style: 'primary'
-        },
-        {
-          type: 'button',
-          action: {
-            type: 'uri',
-            label: 'ปฏิเสธ',
-            uri: 'https://linecorp.com'
-          },
-          flex: 2,
-          color: '#808080',
-          margin: 'md',
+          color: '#57B846',
           style: 'primary'
         }
       ]
     }
   };
+
   return template;
 }
