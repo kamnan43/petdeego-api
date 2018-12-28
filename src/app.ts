@@ -14,7 +14,7 @@ import { di } from './di';
 import { config } from './config';
 import { mongodb } from './mongodb';
 
-//import { router as auth } from './routers/auth';
+import { router as payment } from './routers/payment';
 
 startServer();
 
@@ -72,6 +72,7 @@ async function startServer() {
   app.use(jwt({ secret: config.jwt.secret }).unless({
     path: [
       new RegExp('/healthcheck'),
+      new RegExp('/payment'),
       // new RegExp('/v1/transfer'), // for transfer data from dev to prd
     ],
   }));
@@ -91,7 +92,7 @@ async function startServer() {
     const router = express.Router();
     checkTokenExpired(router, 'TOKEN_EXPIRED');
 
-    //app.use('/v1/auth', middleware, auth);
+    app.use('/v1/payment', middleware, payment);
     // router.use('/roles', role);
 
     return router;
