@@ -104,7 +104,7 @@ export function templateQuotation(order) {
                   },
                   {
                     type: 'text',
-                    text: `${order.date} / ${order.time}`,
+                    text: `${order.date}`,
                     flex: 5,
                     size: 'sm',
                     color: '#666666'
