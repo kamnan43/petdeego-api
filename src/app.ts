@@ -17,6 +17,7 @@ import { mongodb } from './mongodb';
 import { router as order } from './routers/order';
 import { router as quotation } from './routers/quotation';
 import { router as driver } from './routers/driver';
+import { router as payment } from './routers/payment';
 
 startServer();
 
@@ -74,6 +75,7 @@ async function startServer() {
   app.use(jwt({ secret: config.jwt.secret }).unless({
     path: [
       new RegExp('/healthcheck'),
+      new RegExp('/payment'),
       // new RegExp('/v1/transfer'), // for transfer data from dev to prd
     ],
   }));
@@ -93,9 +95,12 @@ async function startServer() {
     const router = express.Router();
     checkTokenExpired(router, 'TOKEN_EXPIRED');
 
-    app.use('/api/v1/order', order);
-    app.use('/api/v1/quotation', quotation);
-    app.use('/api/v1/driver', driver);
+    app.use('/api/v1/order',middleware, order);
+    app.use('/api/v1/quotation',middleware, quotation);
+    app.use('/api/v1/driver',middleware, driver);
+
+    app.use('/v1/payment', middleware, payment);
+    // router.use('/roles', role);
 
     return router;
   };
