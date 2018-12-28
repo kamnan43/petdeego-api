@@ -11,8 +11,8 @@ router.post('/:lineId', saveUser);
 export async function getUser(req, res, next) {
   let response = undefined;
   try {
-    let { body } = req;
-    let criteria = {};
+    let { query } = req;
+    let criteria = query;
     let db = di.get('db');
     let collection = db.collection('users');
     const data = await collection.find(criteria).sort().toArray();
