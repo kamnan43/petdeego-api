@@ -3,6 +3,7 @@ import { manager } from '../manager/manager';
 import { pushMessage } from '../utils/line';
 const { ObjectId } = require('mongodb');
 import { paymentTemplate } from '../template/payment';
+import { pickUpTemplate } from '../template/pickup'
 
 
 async function handlePostback(message, event) {
@@ -42,9 +43,13 @@ async function handleEvent(event) {
             const data = postbackData[1];
             console.log('postbackData ===>' , postbackData);
 			if (action === 'NOTBUY') {
-				return manager.quotation.updateQuotationStatus(data, 2);
+				manager.quotation.updateQuotationStatus(data, 2);
 			} else if (action === 'BUY') {
-				return manager.quotation.updateQuotationStatus(data, 1);
+                manager.quotation.updateQuotationStatus(data, 1);
+                const quotation = await manager.quotation.getQuotationByCriteria({ _id: ObjectId(data)});
+                const order = await manager.order.getOrderByCriteria({ _id: ObjectId(quotation.order_id) });
+                
+                await pushMessage(quotation.user_id, pickUpTemplate(order));
 			}
 			return true;
 		default:
