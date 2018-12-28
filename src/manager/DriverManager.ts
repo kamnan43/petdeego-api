@@ -13,4 +13,15 @@ export class DriverManager {
       throw new Error(err);
     }
   }
+
+  async getDriverById(driverId): Promise<any> {
+    try {
+      let db = di.get('db');
+      let collection = db.collection('drivers');
+      const data = await collection.find({ _id: ObjectId(driverId) }).findOne();
+      return data;
+    } catch (err) {
+      throw new Error(err);
+    }
+  }
 }

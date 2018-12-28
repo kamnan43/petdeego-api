@@ -83,6 +83,10 @@ export async function updateQuotationStatus(req, res, next) {
     if (data.length > 0) {
       manager.quotation.updateQuotationStatus(data[0]._id, body.status);
       if (body.status === 'accepted') {
+        let order = await manager.order.getOrderByCriteria(body.order_id);
+        order.driver_id = data.user_id;
+        order.price = data.price;
+        await manager.order.updateOrder(order._id, order);
         data = await collection.find({ order_id: body.order_id }).sort().toArray();
         data.forEach(element => {
           if (element.user_id !== body.user_id) {
