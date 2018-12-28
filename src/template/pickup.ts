@@ -108,7 +108,7 @@ export function pickUpTemplate(order) {
                   },
                   {
                     type: 'text',
-                    text: `${order.date / order.time}`,
+                    text: `${order.date ? order.date : '-' } / ${order.time ? order.time : '-'}`,
                     flex: 5,
                     size: 'sm',
                     color: '#666666'
