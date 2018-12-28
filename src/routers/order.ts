@@ -19,9 +19,11 @@ async function sendOrderToDriver(order) {
     },
   };
 const drivers = await db.collection('drivers').find(option).toArray();
+
+console.log('drivers ====> ', drivers);
 drivers.forEach(async (driver) => {
   const message = await templateQuotation(order);
-  pushMessage(driver.line_user_id, message)
+  pushMessage(driver.user_id, message)
     .catch((err) => {
       console.log('err', err.originalError.response.data);
     });
