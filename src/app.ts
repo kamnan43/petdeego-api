@@ -19,6 +19,7 @@ import { router as order } from './routers/order';
 import { router as quotation } from './routers/quotation';
 import { router as driver } from './routers/driver';
 import { router as payment } from './routers/payment';
+import { router as webhook } from './routers/webhook';
 
 startServer();
 
@@ -76,11 +77,12 @@ async function startServer() {
   app.use(jwt({ secret: config.jwt.secret }).unless({
     path: [
       new RegExp('/healthcheck'),
-      new RegExp('/payment'),
+      new RegExp('/api/v1/payment'),
       new RegExp('/api/v1/order'),
       new RegExp('/api/v1/driver'),
       new RegExp('/api/v1/quotation'),
       new RegExp('/api/v1/user'),
+      new RegExp('/api/v1/webhook'),
       // new RegExp('/v1/transfer'), // for transfer data from dev to prd
     ],
   }));
@@ -103,7 +105,8 @@ async function startServer() {
     app.use('/api/v1/order', middleware, order);
     app.use('/api/v1/quotation', middleware, quotation);
     app.use('/api/v1/driver', middleware, driver);
-    app.use('/v1/payment', middleware, payment);
+    app.use('/api/v1/payment', middleware, payment);
+    app.use('/api/v1/webhook', middleware, webhook);
     // router.use('/roles', role);
 
     return router;

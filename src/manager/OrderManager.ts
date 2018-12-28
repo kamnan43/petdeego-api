@@ -17,4 +17,15 @@ export class OrderManager {
       throw new Error(err);
     }
   }
+
+  async getOrderByCriteria(criteria?) {
+    try {
+      let db = di.get('db');
+      let collection = db.collection('orders');
+      const data = await collection.find(criteria).sort().toArray();
+      return data;
+    } catch (err) {
+      throw new Error(err);
+    }
+  }
 }
