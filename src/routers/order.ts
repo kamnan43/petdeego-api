@@ -15,6 +15,7 @@ async function sendOrderToDriver(order) {
   const db = di.get('db');
   const drivers = await db.collection('drivers').find({}).toArray();
 
+  console.log('order =====> ', order);
   console.log('drivers ====> ', drivers);
   drivers.forEach(async (driver) => {
     const message = await templateQuotation(order);
