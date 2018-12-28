@@ -1,5 +1,5 @@
+import * as lineSDK from '@line/bot-sdk';
 import { config } from '../config';
-import line from '@line/bot-sdk'
 
 export function getXLineHeader() {
     return {
@@ -9,8 +9,14 @@ export function getXLineHeader() {
     }
 }
 
-export function pushMessage(userId, message){
-    // create LINE SDK client
-    const client = new line.Client(config.line);
-    return client.pushMessage(userId, message);
+export function replyMessage(replyToken, msg) {
+  const lineConfig = config.line;
+  const lineClient = new lineSDK.Client(lineConfig);
+  return lineClient.replyMessage(replyToken, msg);
+}
+
+export function pushMessage(to, msg) {
+  const lineConfig = config.line;
+  const lineClient = new lineSDK.Client(lineConfig);
+  return lineClient.pushMessage(to, msg);
 }
