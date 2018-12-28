@@ -18,7 +18,7 @@ export function templateQuotation(order) {
             contents: [
               {
                 type: 'text',
-                text: 'การเดินทางของคุณ',
+                text: 'Order',
                 size: 'xl'
               }
             ]
@@ -37,6 +37,10 @@ export function templateQuotation(order) {
             layout: 'vertical',
             spacing: 'sm',
             margin: 'lg',
+            action: {
+              type: 'uri',
+              uri: 'https://www.google.com/maps/place/Mo+Chit/@13.8022907,100.5516423,17z/data=!3m1!4b1!4m5!3m4!1s0x30e29c407402e1f1:0x43e7df6aa354257f!8m2!3d13.8022855!4d100.553831'
+            },
             contents: [
               {
                 type: 'box',
@@ -52,7 +56,7 @@ export function templateQuotation(order) {
                   },
                   {
                     type: 'text',
-                    text: `${order.source.address}`,
+                    text: 'Miraina Tower, 4-1-6 Shinjuku, Tokyo',
                     flex: 4,
                     size: 'sm',
                     color: '#666666',
@@ -78,7 +82,7 @@ export function templateQuotation(order) {
                   },
                   {
                     type: 'text',
-                    text: `${order.destination.address}`,
+                    text: '10:00 - 23:00',
                     flex: 4,
                     size: 'sm',
                     color: '#666666',
@@ -104,28 +108,7 @@ export function templateQuotation(order) {
                   },
                   {
                     type: 'text',
-                    text: `${order.date}`,
-                    flex: 5,
-                    size: 'sm',
-                    color: '#666666'
-                  }
-                ]
-              },
-              {
-                type: 'box',
-                layout: 'baseline',
-                spacing: 'sm',
-                contents: [
-                  {
-                    type: 'text',
-                    text: 'ชำระเงิน',
-                    flex: 2,
-                    size: 'sm',
-                    color: '#AAAAAA'
-                  },
-                  {
-                    type: 'text',
-                    text: `${order.payment === 'cash' ? 'เงินสด' : 'Line Pay'}`,
+                    text: 'xxxxx',
                     flex: 5,
                     size: 'sm',
                     color: '#666666'
@@ -162,7 +145,7 @@ export function templateQuotation(order) {
                   },
                   {
                     type: 'text',
-                    text: ``,
+                    text: 'Text',
                     flex: 5,
                     size: 'sm',
                     color: '#666666'
@@ -183,7 +166,7 @@ export function templateQuotation(order) {
                   },
                   {
                     type: 'text',
-                    text: `${order.qty}`,
+                    text: 'Text',
                     flex: 5,
                     size: 'sm',
                     color: '#666666'
@@ -204,7 +187,7 @@ export function templateQuotation(order) {
                   },
                   {
                     type: 'text',
-                    text: `${order.sizes}`,
+                    text: 'Text',
                     flex: 5,
                     size: 'sm',
                     color: '#666666'
@@ -236,7 +219,7 @@ export function templateQuotation(order) {
                   },
                   {
                     type: 'text',
-                    text: `${order.customer.phone}`,
+                    text: 'Text',
                     flex: 5,
                     size: 'sm',
                     color: '#666666'
@@ -262,9 +245,9 @@ export function templateQuotation(order) {
             action: {
               type: 'uri',
               label: 'เสนอราคา',
-              uri: `line://app/1634629146-l1a2NRyX?order_id=${order._id}`,
+              uri: 'https://linecorp.com'
             },
-            color: '#00d5ca',
+            color: '#57B846',
             height: 'sm',
             style: 'primary'
           },
