@@ -4,17 +4,17 @@ import { di } from '../di';
 
 export const router = express.Router();
 
-router.get('/', getCustomer);
-router.post('/', saveCustomer);
-router.put('/:lineId', updateCustomer);
+router.get('/', getUser);
+router.post('/:lineId', saveUser);
+// router.put('/:lineId', updateUser);
 
-export async function getCustomer(req, res, next) {
+export async function getUser(req, res, next) {
   let response = undefined;
   try {
     let { body } = req;
     let criteria = {};
     let db = di.get('db');
-    let collection = db.collection('customers');
+    let collection = db.collection('users');
     const data = await collection.find(criteria).sort().toArray();
     if (data) {
       response = resp(data);
@@ -28,14 +28,19 @@ export async function getCustomer(req, res, next) {
   next(response);
 }
 
-export async function saveCustomer(req, res, next) {
+export async function saveUser(req, res, next) {
   let response = undefined;
   try {
-    let { body } = req;
+    let { body, params } = req;
+    console.log('params', params);
+    console.log('body', body);
     let db = di.get('db');
-    let collection = db.collection('digital_partners');
+    let collection = db.collection('users');
     body.registed_at = new Date();
-    let dp = await collection.insertOne(body);
+    let dp = await collection.update({ line_id: params.lineId }, { $set: body }, {
+      upsert: true,
+    });
+    console.log('dp', dp);
     response = resp({ id: dp.insertedId }, 200);
   } catch (err) {
     console.log('err', err);
@@ -43,14 +48,14 @@ export async function saveCustomer(req, res, next) {
   }
   next(response);
 }
-
-export async function updateCustomer(req, res, next) {
+/*
+export async function updateUser(req, res, next) {
   let response = undefined;
   try {
     let db = di.get('db');
     let collection = db.collection('customers');
     let update = await collection.updateOne(
-      { // _id 
+      { // _id
       },
       {
         //$set: property  to update,
@@ -67,3 +72,4 @@ export async function updateCustomer(req, res, next) {
   }
   next(response);
 }
+*/
