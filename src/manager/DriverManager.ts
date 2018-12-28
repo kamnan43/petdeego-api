@@ -24,4 +24,17 @@ export class DriverManager {
       throw new Error(err);
     }
   }
+
+  async updateDriver(userId, data): Promise<any> {
+    try {
+      let db = di.get('db');
+      let collection = db.collection('drivers');
+      let update = await collection.updateOne(
+        { 'user_id': userId }, {$set: data}
+      );
+      return update;
+    } catch (err) {
+      throw new Error(err);
+    }
+  }
 }

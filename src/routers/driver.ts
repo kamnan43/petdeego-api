@@ -8,7 +8,7 @@ export const router = express.Router();
 router.get('/', getDriver);
 router.get('/:userid', getDriverByUserId);
 router.post('/', createDriver);
-router.put('/update', updateDriver);
+router.put('/:userId', updateDriver);
 
 export async function getDriver(req, res, next) {
     let response = undefined;
@@ -65,13 +65,16 @@ export async function createDriver(req, res, next) {
     next(response);
   }
 
-  export async function updateDriver(req, res, next) {
+export async function updateDriver(req, res, next) {
     let response = undefined;
     try {
-
+        let { body } = req;
+        let userId = req.params.userId;
+        await manager.driver.updateDriver(userId,body);
+        response = resp({ result: 'success' }, 200);
     } catch (err) {
-      console.log('err', err);
-      response = resp({ message: err.message }, 400);
+        console.log('err', err);
+        response = resp({ message: err.message }, 400);
     }
     next(response);
-  }
+}
