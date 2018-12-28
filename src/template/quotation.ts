@@ -162,7 +162,7 @@ export function templateQuotation(order) {
                   },
                   {
                     type: 'text',
-                    text: `${order.pet_type}`,
+                    text: ``,
                     flex: 5,
                     size: 'sm',
                     color: '#666666'
