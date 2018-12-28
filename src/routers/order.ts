@@ -4,7 +4,19 @@ import { resp } from '../utils/resp';
 
 export const router = express.Router();
 
-router.post('/', );
+router.get('/', getOrder);
+router.post('/', createOrder);
+
+export async function getOrder(req, res, next) {
+  let response = undefined;
+  try {
+    response = resp({ result: 'success' }, 200);
+  } catch (err) {
+    console.log('err', err);
+    response = resp({ message: err.message }, 400);
+  }
+  next(response);
+}
 
 export async function createOrder(req, res, next) {
   let response = undefined;
@@ -12,7 +24,7 @@ export async function createOrder(req, res, next) {
     let { body } = req;
     let db = di.get('db');
     let collection = db.collection('orders');
-    let order = await collection.insertOne(body);
+    await collection.insertOne(body);
     response = resp({ result: 'success' }, 200);
   } catch (err) {
     console.log('err', err);
