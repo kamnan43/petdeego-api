@@ -4,6 +4,7 @@ import { pushMessage } from '../utils/line';
 const { ObjectId } = require('mongodb');
 import { paymentTemplate } from '../template/payment';
 
+
 async function handlePostback(message, event) {
     const postbackData = event.postback.data.split('_');
     const action = postbackData[0];
@@ -36,6 +37,15 @@ async function handleEvent(event) {
             await handlePostback(message, event); break;
         //     let data = event.postback.data;
         //     return replyText(event.replyToken, `Got postback: ${data}`);
+            const postbackData = event.postback.data.split('_');
+            const action = postbackData[0];
+            const data = postbackData[1];
+            if (action === 'NOTBUY') {
+                return manager.quotation.updateQuotationStatus(data, 2);
+            } else if (action === 'BUY') {
+                return manager.quotation.updateQuotationStatus(data, 1);
+            }
+            return true;
         default:
             throw new Error(`Unknown event: ${JSON.stringify(event)}`);
     }
