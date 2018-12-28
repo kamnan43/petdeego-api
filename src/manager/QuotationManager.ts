@@ -17,4 +17,15 @@ export class QuotationManager {
       throw new Error(err);
     }
   }
+
+  async getQuotationByCriteria(criteria = {}) {
+    try {
+      let db = di.get('db');
+      let collection = db.collection('quotations');
+      const data = await collection.find(criteria).findOne();
+      return data;
+    } catch (err) {
+      throw new Error(err);
+    }
+  }
 }

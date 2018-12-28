@@ -58,8 +58,11 @@ export async function getQuotationList(req, res, next) {
   next(response);
 }
 
-async function sendQuotationToUser(quotation) {
+async function sendQuotationToUser(quoId) {
   const db = di.get('db');
+  let quotation = await manager.quotation.getQuotationByCriteria({ _id: ObjectId(quoId)});
+
+  console.log('quotation ====> ', quotation);
   let order = await manager.order.getOrderByCriteria({ _id: ObjectId(quotation.order_id)});
   let driver = await manager.driver.getDriverById(quotation.user_id);
   let lineUserId = order.customer.userId;
@@ -82,7 +85,7 @@ export async function saveQuotation(req, res, next) {
     body.created_at = new Date();
     body.status = 'quoted';
     let quo = await collection.insertOne(body);
-    sendQuotationToUser(quo);
+    sendQuotationToUser(quo.insertedId);
     response = resp({ id: quo.insertedId }, 200);
   } catch (err) {
     console.log('err', err);
