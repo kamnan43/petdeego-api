@@ -42,7 +42,7 @@ export function confirmQuotation (order, driver, quotation) {
                 contents: [
                   {
                     type: 'text',
-                    text: `${order.price}฿`,
+                    text: `${quotation.price}฿`,
                     margin: 'sm',
                     size: 'xxl',
                     align: 'center',
