@@ -1,6 +1,7 @@
 import * as express from 'express';
 import { resp } from '../utils/resp';
 import { di } from '../di';
+import { manager } from '../manager/manager';
 
 export const router = express.Router();
 
@@ -11,11 +12,7 @@ router.put('/update', updateDriver);
 export async function getDriver(req, res, next) {
     let response = undefined;
     try {
-      let { body } = req;
-      let criteria = {};
-      let db = di.get('db');
-      let collection = db.collection('drivers');
-      const data = await collection.find(criteria).sort().toArray();
+      const data = await manager.driver.getDrivers();
       if (data) {
         response = resp(data);
       } else {
