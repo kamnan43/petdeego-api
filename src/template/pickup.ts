@@ -15,7 +15,7 @@ function getTemplate(order) {
           contents: [
             {
               type: 'text',
-              text: 'Order',
+              text: 'การเดินทางของคุณ',
               size: 'xl'
             }
           ]
