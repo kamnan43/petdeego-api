@@ -18,16 +18,20 @@ export async function createOrderMessage(order, driver) {
 }
 async function sendOrderToDriver(order) {
   const db = di.get('db');
-  const option = {};
-  const drivers = await db.collection('drivers').find(option).toArray();
-  drivers.forEach(async (driver) => {
-    const message = await createOrderMessage(order, driver);
-    pushMessage(driver.line_user_id, message)
-      .catch((err) => {
-        console.log('err', err.originalError.response.data);
-      });
-  });
-  return drivers.length;
+  const option = {
+    pet_type: {
+      $in: [order.pet_type],
+    },
+  };
+const drivers = await db.collection('drivers').find(option).toArray();
+drivers.forEach(async (driver) => {
+  const message = await createOrderMessage(order, driver);
+  pushMessage(driver.line_user_id, message)
+    .catch((err) => {
+      console.log('err', err.originalError.response.data);
+    });
+});
+return drivers.length;
 }
 
 export async function getOrder(req, res, next) {
