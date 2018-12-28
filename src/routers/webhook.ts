@@ -39,7 +39,8 @@ async function handleEvent(event) {
 			//     return replyText(event.replyToken, `Got postback: ${data}`);
 			const postbackData = event.postback.data.split('_');
 			const action = postbackData[0];
-			const data = postbackData[1];
+            const data = postbackData[1];
+            console.log('postbackData ===>' , postbackData);
 			if (action === 'NOTBUY') {
 				return manager.quotation.updateQuotationStatus(data, 2);
 			} else if (action === 'BUY') {
