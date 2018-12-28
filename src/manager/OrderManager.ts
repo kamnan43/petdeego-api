@@ -18,6 +18,19 @@ export class OrderManager {
     }
   }
 
+  async updateOrder(_id, data): Promise<any> {
+    try {
+      let db = di.get('db');
+      let collection = db.collection('orders');
+      let update = await collection.updateOne(
+        { '_id': ObjectId(_id) }, data
+      );
+      return update;
+    } catch (err) {
+      throw new Error(err);
+    }
+  }
+
   async getOrdersByCriteria(criteria = {}) {
     try {
       let db = di.get('db');
