@@ -3,6 +3,7 @@ import { di } from '../di';
 import { resp } from '../utils/resp';
 import { manager } from '../manager/manager';
 import { pushMessage } from '../utils/line';
+import { templateQuotation } from '../template/quotation';
 
 export const router = express.Router();
 
@@ -10,12 +11,6 @@ router.get('/', getOrder);
 router.post('/', createOrder);
 router.get('/update/:orderid/:status', updateOrderStatus);
 
-export async function createOrderMessage(order, driver) {
-  return {
-    type: 'text',
-    text: 'got new order'
-  };
-}
 async function sendOrderToDriver(order) {
   const db = di.get('db');
   const option = {
@@ -25,7 +20,7 @@ async function sendOrderToDriver(order) {
   };
 const drivers = await db.collection('drivers').find(option).toArray();
 drivers.forEach(async (driver) => {
-  const message = await createOrderMessage(order, driver);
+  const message = await templateQuotation(order);
   pushMessage(driver.line_user_id, message)
     .catch((err) => {
       console.log('err', err.originalError.response.data);
