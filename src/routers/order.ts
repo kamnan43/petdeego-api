@@ -19,6 +19,7 @@ export async function getOrder(req, res, next) {
 }
 
 export async function createOrder(req, res, next) {
+  console.log('body ====> ', req.body);
   let response = undefined;
   try {
     let { body } = req;

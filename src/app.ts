@@ -96,7 +96,7 @@ async function startServer() {
     const router = express.Router();
     checkTokenExpired(router, 'TOKEN_EXPIRED');
 
-    app.use('/api/v1/order', order);
+    app.use('/api/v1/order', middleware, order);
     app.use('/api/v1/quotation',middleware, quotation);
     app.use('/api/v1/driver',middleware, driver);
 
