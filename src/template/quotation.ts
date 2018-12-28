@@ -162,7 +162,7 @@ export function templateQuotation(order) {
                   },
                   {
                     type: 'text',
-                    text: ``,
+                    text: `-`,
                     flex: 5,
                     size: 'sm',
                     color: '#666666'
