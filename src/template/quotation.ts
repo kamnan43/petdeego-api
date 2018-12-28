@@ -270,7 +270,7 @@ export function templateQuotation(order) {
             action: {
               type: 'uri',
               label: 'เสนอราคา',
-              uri: `line://app/1634629146-wOjG5r8O?order_id=${order._id}`,
+              uri: `line://app/1634629146-AdLp1mRP?order_id=${order._id}`,
             },
             color: '#00d5ca',
             height: 'sm',
