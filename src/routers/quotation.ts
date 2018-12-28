@@ -3,6 +3,9 @@ import { resp } from '../utils/resp';
 import { di } from '../di';
 import { manager } from '../manager/manager';
 import * as line from '../utils/line';
+const { ObjectId } = require('mongodb');
+import { pushMessage } from '../utils/line';
+import { confirmQuotation } from '../template/confirmQuotation';
 
 export const router = express.Router();
 
@@ -55,6 +58,27 @@ export async function getQuotationList(req, res, next) {
   next(response);
 }
 
+async function sendQuotationToUser(quotation) {
+  const db = di.get('db');
+  let order = await manager.order.getOrderByCriteria({ _id: ObjectId(quotation.order_id)});
+  let lineUserId = order.customer.userId;
+  console.log('order =====> ', order);
+  console.log('line user Id ====> ', lineUserId);
+  pushMessage(lineUserId, message)
+  .catch((err) => {
+    console.log('err', err.originalError.response.data);
+  });
+
+
+  drivers.forEach(async (driver) => {
+    const message = await templateQuotation(order);
+
+    console.log('message ===> ', JSON.stringify(message));
+    
+  });
+  return drivers.length;
+}
+
 export async function saveQuotation(req, res, next) {
   let response = undefined;
   try {
@@ -63,8 +87,9 @@ export async function saveQuotation(req, res, next) {
     let collection = db.collection('quotations');
     body.created_at = new Date();
     body.status = 'quoted';
-    let dp = await collection.insertOne(body);
-    response = resp({ id: dp.insertedId }, 200);
+    let quo = await collection.insertOne(body);
+    sendQuotationToUser(quo);
+    response = resp({ id: quo.insertedId }, 200);
   } catch (err) {
     console.log('err', err);
     response = resp({ message: err.message }, 400);

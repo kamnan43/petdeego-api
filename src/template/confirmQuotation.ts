@@ -1,5 +1,5 @@
 
-function confirmQuotation (order, driver) {
+export function confirmQuotation (order, driver) {
   const template = {
     type: 'bubble',
     hero: {
