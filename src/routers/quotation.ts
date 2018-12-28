@@ -2,7 +2,7 @@ import * as express from 'express';
 import { resp } from '../utils/resp';
 import { di } from '../di';
 import { manager } from '../manager/manager';
-import { line } from '../utils/line';
+import * as line from '../utils/line';
 
 export const router = express.Router();
 
@@ -88,15 +88,15 @@ export async function updateQuotationStatus(req, res, next) {
           if (element.user_id !== body.user_id) {
             manager.quotation.updateQuotationStatus(element._id, 'rejected');
             // Todo: push reject (element.user_id, 'rejected')
-            line.pushMessage(element.user_id);
+            line.pushMessage(element.user_id, '');
           } else {
             // Todo: push accept (element.user_id, 'accepted')
-            line.pushMessage(element.user_id);
+            line.pushMessage(element.user_id, '');
           }
         });
       } else {
         // Todo: push reject (data[0].user_id)
-        line.pushMessage(data[0].user_id);
+        line.pushMessage(data[0].user_id, '');
       }
     }
   } catch (err) {
