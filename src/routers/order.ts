@@ -8,7 +8,7 @@ export const router = express.Router();
 
 router.get('/', getOrder);
 router.post('/', createOrder);
-router.post('/update', updateOrderStatus);
+router.get('/update/:orderid/:status', updateOrderStatus);
 
 export async function createOrderMessage(order, driver) {
   return {
@@ -77,8 +77,8 @@ export async function createOrder(req, res, next) {
 export async function updateOrderStatus(req, res, next) {
   let response = undefined;
   try {
-    let { body } = req;
-    await manager.order.updateOrderStatus(body.order_id, body.status);
+    let { orderid, status } = req.params;
+    await manager.order.updateOrderStatus(orderid, status);
     response = resp({ result: 'success' }, 200);
   } catch (err) {
     console.log('err', err);
