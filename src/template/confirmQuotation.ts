@@ -68,7 +68,7 @@ export function confirmQuotation (order, driver, quotation) {
             action: {
               type: 'postback',
               label: 'รับข้อเสนอ',
-              uri: `BUY_${quotation._id}`
+              data: `BUY_${quotation._id}`
             },
             flex: 2,
             color: '#00d5ca',
@@ -79,7 +79,7 @@ export function confirmQuotation (order, driver, quotation) {
             action: {
               type: 'postback',
               label: 'ปฏิเสธ',
-              uri:  `NOTBUY_${quotation._id}`
+              data:  `NOTBUY_${quotation._id}`
             },
             flex: 2,
             color: '#808080',
