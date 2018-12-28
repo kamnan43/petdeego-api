@@ -1,6 +1,22 @@
 import * as express from 'express';
+import { manager } from '../manager/manager';
+import { pushMessage } from '../utils/line';
+const { ObjectId } = require('mongodb');
+import { paymentTemplate } from '../template/payment';
 
 async function handlePostback(message, event) {
+    const postbackData = event.postback.data.split('_');
+    const action = postbackData[0];
+    if (action === 'updateorderstatus') {
+        let orderId = postbackData[1];
+        let status = postbackData[2];
+        await manager.order.updateOrderStatus(orderId, status);
+        let order = await manager.order.getOrderByCriteria({ _id: ObjectId(orderId) });
+        let driver = await manager.driver.getDriverById(order.driver_id);
+        await pushMessage(event.replyToken, paymentTemplate(order, driver));
+        let user = await manager.user.getUser({ _id: ObjectId(order.user_id) });
+        await pushMessage(user.line_id, { type: 'text', text: 'สัตว์เลี้ยงของคุณอยู่ระหว่างดำเนินการส่ง' });
+    }
     console.log('handlePostback', event);
 }
 
