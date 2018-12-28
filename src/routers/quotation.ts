@@ -65,7 +65,7 @@ async function sendQuotationToUser(quotation) {
   let lineUserId = order.customer.userId;
   console.log('order =====> ', order);
   console.log('line user Id ====> ', lineUserId);
-  let message = await confirmQuotation(order, driver);
+  let message = await confirmQuotation(order, driver, quotation);
   pushMessage(lineUserId, message)
   .catch((err) => {
     console.log('err', err.originalError.response.data);
