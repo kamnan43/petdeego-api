@@ -59,7 +59,8 @@ export async function createOrder(req, res, next) {
     let { body } = req;
     let db = di.get('db');
     let collection = db.collection('orders');
-    await collection.insertOne(body);
+    let order = await collection.insertOne(body);
+    body['_id'] = order.insertedId;
     await sendOrderToDriver(body);
     response = resp({ result: 'success' }, 200);
   } catch (err) {
