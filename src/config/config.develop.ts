@@ -18,6 +18,15 @@ const config = {
       container: 'develop',
     },
   },
+  line: {
+    channelAccessToken: '3wtcgqjnoV+ZEAXV6wnWC+pM4JhxkI70hza4ZnwL2eawUQ3DLBEDVHrwT/iSLzoTMSi6SVj79L9S8O1THT9jCLXa1Vus2x8cFp76z4CDeIipG2jGVn/AreFEibcviWGy5Go76HpbE919iuySm2+vXwdB04t89/1O/w1cDnyilFU=',
+    channelSecret: 'ee1e93ad38f7438443f6c47aa3a20ca3'
+  },
+  linepay: {
+    api: 'https://sandbox-api-pay.line.me',
+    channelId: '1634637036',
+    channelSecret: 'e4804d3d1a51bb8a01058ffd76ecf9fd'
+  },
 };
 
 export default config;
