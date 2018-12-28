@@ -64,7 +64,9 @@ async function sendQuotationToUser(quoId) {
 
   console.log('quotation ====> ', quotation);
   let order = await manager.order.getOrderByCriteria({ _id: ObjectId(quotation.order_id)});
+  console.log('order =====> ', order);
   let driver = await manager.driver.getDriverById(quotation.user_id);
+  console.log('driver =====> ', driver);
   let lineUserId = order.customer.userId;
   console.log('order =====> ', order);
   console.log('line user Id ====> ', lineUserId);
