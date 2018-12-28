@@ -33,7 +33,7 @@ export async function createDriver(req, res, next) {
       let collection = db.collection('drivers');
       body.registed_at = new Date();
       let dp = await collection.insertOne(body);
-      response = resp({ id: dp.insertedId }, 200);
+      response = resp({ id: dp.insertedId, user_id: body.user_id }, 200);
     } catch (err) {
       console.log('err', err);
       response = resp({ message: err.message }, 400);
