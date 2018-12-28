@@ -61,22 +61,16 @@ export async function getQuotationList(req, res, next) {
 async function sendQuotationToUser(quotation) {
   const db = di.get('db');
   let order = await manager.order.getOrderByCriteria({ _id: ObjectId(quotation.order_id)});
+  let driver = await manager.driver.getDriverById(quotation.user_id);
   let lineUserId = order.customer.userId;
   console.log('order =====> ', order);
   console.log('line user Id ====> ', lineUserId);
+  let message = await confirmQuotation(order, driver);
   pushMessage(lineUserId, message)
   .catch((err) => {
     console.log('err', err.originalError.response.data);
   });
-
-
-  drivers.forEach(async (driver) => {
-    const message = await templateQuotation(order);
-
-    console.log('message ===> ', JSON.stringify(message));
-    
-  });
-  return drivers.length;
+  console.log('message ===> ', JSON.stringify(message));
 }
 
 export async function saveQuotation(req, res, next) {
