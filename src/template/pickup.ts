@@ -193,9 +193,9 @@ function getTemplate(order) {
         {
           type: 'button',
           action: {
-            type: 'uri',
+            type: 'postback',
             label: 'pick up',
-            uri: `http://cdc06469.ngrok.io/api/v1/order/update/${order._id}/3`
+            data: `updateorderstatus_${order._id}_3`
           },
           color: '#00d5ca',
           height: 'sm',
