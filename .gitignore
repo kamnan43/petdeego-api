@@ -1,0 +1,11 @@
+.nyc_output
+node_modules
+dist
+coverage
+test*.js
+loadtest.json
+loadtest.json.html
+*.tar.gz
+logging.log
+logs
+.vscode
