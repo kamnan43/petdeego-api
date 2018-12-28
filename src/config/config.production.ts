@@ -1,10 +1,10 @@
 const config = {
   mongodb: {
-    host: 'cms-db80.documents.azure.com',
+    host: 'alphaem.documents.azure.com',
     port: 10255,
-    username: 'cms-db80',
-    password: 'wExdcxiYaULIElUj3pVlR4oR4lCBlvTPI7pW2tPJoqRjOaRFCsKR43s5OVql458VaQ5cWgRfiURNzNS7XPcCrA==',
-    database: 'dps-db',
+    username: 'alphaem',
+    password: '5pDTAqhBHw2RjWxScXRY7rjEloG5Q47ewTfI6vuZOu2BP3lVKez1RihhLhhBYyX608NBHOPSqBTSDu0nyasuLQ==',
+    database: 'admin',
     qs: '?ssl=true&sslverifycertificate=false',
   },
   jwt: {
