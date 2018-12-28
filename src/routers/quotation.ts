@@ -20,7 +20,7 @@ export async function getQuotation(req, res, next) {
     };
     let db = di.get('db');
     let collection = db.collection('quotations');
-    const data = await collection.find(criteria).sort().toArray();
+    const data = await collection.findOne(criteria);
     if (data) {
       response = resp(data);
     } else {
@@ -60,13 +60,18 @@ export async function updateQuotationStatus(req, res, next) {
     let data = await collection.find({user_id: body.user_id, order_id: body.order_id}).sort().toArray();
     if (data.length > 0) {
       manager.quotation.updateQuotationStatus(data[0]._id, body.status);
-      if (body.status !== 'accepted') {
+      if (body.status === 'accepted') {
         data = await collection.find({order_id: body.order_id}).sort().toArray();
         data.forEach(element => {
           if (element.user_id !== body.user_id) {
             manager.quotation.updateQuotationStatus(element._id, 'rejected');
+            // Todo: push reject (element.user_id, 'rejected')
+          } else {
+            // Todo: push accept (element.user_id, 'accepted')
           }
         });
+      } else {
+        // Todo: push reject (data[0].user_id)
       }
     }
   } catch (err) {
