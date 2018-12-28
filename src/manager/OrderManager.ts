@@ -46,7 +46,7 @@ export class OrderManager {
     try {
       let db = di.get('db');
       let collection = db.collection('orders');
-      const data = await collection.find(criteria).findOne();
+      const data = await collection.findOne(criteria);
       return data;
     } catch (err) {
       throw new Error(err);

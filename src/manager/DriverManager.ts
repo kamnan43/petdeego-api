@@ -18,7 +18,7 @@ export class DriverManager {
     try {
       let db = di.get('db');
       let collection = db.collection('drivers');
-      const data = await collection.find({ _id: ObjectId(driverId) }).findOne();
+      const data = await collection.findOne({ _id: ObjectId(driverId) });
       return data;
     } catch (err) {
       throw new Error(err);
