@@ -14,6 +14,7 @@ import { di } from './di';
 import { config } from './config';
 import { mongodb } from './mongodb';
 
+import { router as user } from './routers/user';
 import { router as order } from './routers/order';
 import { router as quotation } from './routers/quotation';
 import { router as driver } from './routers/driver';
@@ -77,6 +78,9 @@ async function startServer() {
       new RegExp('/healthcheck'),
       new RegExp('/payment'),
       new RegExp('/api/v1/order'),
+      new RegExp('/api/v1/driver'),
+      new RegExp('/api/v1/quotation'),
+      new RegExp('/api/v1/user'),
       // new RegExp('/v1/transfer'), // for transfer data from dev to prd
     ],
   }));
@@ -95,11 +99,10 @@ async function startServer() {
   const createRoute = () => {
     const router = express.Router();
     checkTokenExpired(router, 'TOKEN_EXPIRED');
-
+    app.use('/api/v1/user', middleware, user);
     app.use('/api/v1/order', middleware, order);
-    app.use('/api/v1/quotation',middleware, quotation);
-    app.use('/api/v1/driver',middleware, driver);
-
+    app.use('/api/v1/quotation', middleware, quotation);
+    app.use('/api/v1/driver', middleware, driver);
     app.use('/v1/payment', middleware, payment);
     // router.use('/roles', role);
 
