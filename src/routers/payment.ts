@@ -2,7 +2,8 @@ import * as express from 'express';
 import * as rp from 'request-promise';
 import { config } from '../config';
 import { di } from '../di';
-// import { getXLineHeader } from '../utils/line';
+const { ObjectId } = require('mongodb');
+import * as line from '../utils/line';
 
 // function reservePayment(req, res) {
 //     console.log('reservePayment');
@@ -44,32 +45,28 @@ import { di } from '../di';
 async function confirmPayment(req, res) {
     let { transactionId, orderId } = req.query;
     let url = `${config.linepay.api}/v2/payments/${transactionId}/confirm`;
-    let data;
     const orderInfo = await getOrderInfo(orderId);
-
-    data = orderInfo;
     let body = {
-        amount: data.amount,
+        amount: orderInfo.price,
         currency: 'THB',
-    };
-    let headers = {
-        'X-LINE-ChannelId': config.linepay.channelId,
-        'X-LINE-ChannelSecret': config.linepay.channelSecret,
-        'Content-Type': 'application/json',
     };
     return rp({
         method: 'POST',
         uri: url,
         body: body,
-        headers,
+        headers: line.getXLineHeader(),
         json: true,
     })
-        .then(function (response) {
+        .then(response => {
             console.log('response', JSON.stringify(response));
-            if (response && response.returnCode === '0000' && response.info) {
-                data.status = 'paid';
-                updateOrderInfo(orderId, data);
+            line.pushMessage(orderInfo.customer.userId, { type: 'text', text: 'ได้รับชำระเงินเรียบร้อยแล้ว ขอบคุณที่ใช้บริการค่ะ' });
+            line.pushMessage(orderInfo.driver_id, { type: 'text', text: 'ลูกค้าชำระเงินเรียบร้อยแล้ว' });
+            orderInfo.status = 'paid';
+            updateOrderInfo(orderId, orderInfo);
 
+            if (response && response.returnCode === '0000' && response.info) {
+                orderInfo.status = 'settled';
+                updateOrderInfo(orderId, orderInfo);
             }
             res.send(response);
         })
@@ -79,10 +76,10 @@ async function confirmPayment(req, res) {
         });
 };
 
-async function getOrderInfo(orderId) {
+async function getOrderInfo(orderId): Promise<any> {
     return new Promise(async (resolve, reject) => {
         try {
-            let criteria = { order_id: orderId };
+            let criteria = { _id: ObjectId(orderId) };
             let db = di.get('db');
             const data = await db.collection('orders').findOne(criteria);
             if (data) {
@@ -101,7 +98,7 @@ async function updateOrderInfo(orderId, body) {
     return new Promise(async (resolve, reject) => {
         try {
             let db = di.get('db');
-            await db.collection('orders').updateOne({ _id: orderId }, { $set: body });
+            await db.collection('orders').updateOne({ _id: ObjectId(orderId) }, { $set: body });
             resolve();
         } catch (err) {
             console.log('err', err);
@@ -113,4 +110,4 @@ async function updateOrderInfo(orderId, body) {
 export const router = express.Router();
 
 // router.get('/reserve', reservePayment);
-router.post('/confirm', confirmPayment);
+router.get('/confirm', confirmPayment);
