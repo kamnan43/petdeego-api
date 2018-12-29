@@ -97,12 +97,12 @@ async function handlePostback(message, event) {
 		await manager.order.updateOrderStatus(orderId, 'pickedup');
 		let order = await manager.order.getOrderByCriteria({ _id: ObjectId(orderId) });
 		let driver = await manager.driver.getDriverByUserId(order.driver_id);
-		if (order.owner === 1) {
+		if (order.owner) {
 			await line.pushMessage(order.customer.userId, { type: 'text', text: 'คนขับของคุณมาถึงจุดนัดหมายแล้ว' });
 		} else {
 			await line.pushMessage(order.customer.userId, { type: 'text', text: 'สัตว์เลี้ยงของคุณอยู่ระหว่างดำเนินการส่ง' });
 		}
-		if (order.payment === line) {
+		if (order.payment === 'line') {
 			reservePayment(order)
 				.then(async (paymentRes) => {
 					const paymentUrl = paymentRes.info.paymentUrl.web;
