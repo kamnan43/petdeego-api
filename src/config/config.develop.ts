@@ -27,7 +27,7 @@ const config = {
     channelId: '1634637036',
     channelSecret: 'e4804d3d1a51bb8a01058ffd76ecf9fd'
   },
-  apiUrl: 'https://petdee-api.alphaem-dev.tech/api',
+  apiUrl: 'https://petdee-api.alphaem-dev.tech/api/v1',
 };
 
 export default config;
