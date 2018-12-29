@@ -73,5 +73,9 @@ export function paymentTemplate(order, driver, paymentUrl) {
     }
   };
 
-  return template;
+  return {
+    type: 'flex',
+    altText: 'ชำระเงิน',
+    contents: template,
+  };
 }
