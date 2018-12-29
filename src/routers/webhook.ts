@@ -1,10 +1,62 @@
 import * as express from 'express';
 import { manager } from '../manager/manager';
-import { replyMessage, pushMessage } from '../utils/line';
-const { ObjectId } = require('mongodb');
+import * as line from '../utils/line';
+import { di } from '../di';
 import { paymentTemplate } from '../template/payment';
 import { pickUpTemplate } from '../template/pickup'
+const { ObjectId } = require('mongodb');
 
+export async function updateQuotationStatus(quotation_id, status) {
+	try {
+		let db = di.get('db');
+		let collection = db.collection('quotations');
+
+		let quotation = await collection.findOne({ _id: ObjectId(quotation_id) });
+		if (quotation) {
+			manager.quotation.updateQuotationStatus(quotation_id, status);
+			const order = await manager.order.getOrderByCriteria(quotation.order_id);
+			if (status === 'accepted') {
+				// update order
+				order.driver_id = quotation.user_id;
+				order.price = quotation.price;
+				await manager.order.updateOrder(order._id, order);
+
+				// send msg to selected driver
+				// line.pushMessage(quotation.user_id, {
+				// 	type: 'text',
+				// 	text: `คุณได้รับเลือกจากคุณ [${order.customer.displayName}]\n \
+				// 	เบอร์ติดต่อ : ${order.customer.phone}\n \
+				// 	จาก : ${order.source.address}\n \
+				// 	ไป : ${order.destination.address}\n \
+				// 	เวลานัด : ${order.date}\n \
+				// 	ราคา : ${quotation.price}\n \
+				// 	ชำระโดย : ${order.payment === 'line' ? 'LINE Pay' : 'เงินสด'}`,
+				// });
+				await line.pushMessage(quotation.user_id, pickUpTemplate(order));
+
+				// send msg to other driver
+				const otherQt = await collection.find({
+					order_id: quotation.order_id,
+					_id: { $ne: quotation_id },
+				}).toArray();
+				otherQt.forEach(element => {
+					manager.quotation.updateQuotationStatus(element._id, 'rejected');
+					line.pushMessage(element.user_id, {
+						type: 'text',
+						text: `รายการของคุณ [${order.customer.displayName}] ถูกยกเลิก เนื่องจากลูกค้าเลือกเรียกรถคนอื่นแล้ว`,
+					});
+				});
+			} else {
+				line.pushMessage(quotation.user_id, {
+					type: 'text',
+					text: `รายการของคุณ [${order.customer.displayName}] ถูกยกเลิก เนื่องจากลูกค้าปฏิเสธข้อเสนอของคุณ`,
+				});
+			}
+		}
+	} catch (err) {
+		console.log('err', err);
+	}
+}
 
 async function handlePostback(message, event) {
 	console.log('handlePostback', event);
@@ -12,24 +64,25 @@ async function handlePostback(message, event) {
 	const action = postbackData[0];
 	const data = postbackData[1];
 	console.log('postbackData ===>', postbackData);
-	if (action === 'updateorderstatus') {
-		let orderId = postbackData[1];
-		let status = postbackData[2];
-		await manager.order.updateOrderStatus(orderId, status);
+	if (action === 'PICKUP') {
+		let orderId = data;
+		await manager.order.updateOrderStatus(orderId, 'pickedup');
 		let order = await manager.order.getOrderByCriteria({ _id: ObjectId(orderId) });
 		let driver = await manager.driver.getDriverById(order.driver_id);
-		await pushMessage(event.replyToken, paymentTemplate(order, driver));
-		let user = await manager.user.getUser({ _id: ObjectId(order.user_id) });
-		await pushMessage(user.line_id, { type: 'text', text: 'สัตว์เลี้ยงของคุณอยู่ระหว่างดำเนินการส่ง' });
+		if (order.owner === 1) {
+			await line.pushMessage(order.customer.userId, { type: 'text', text: 'คนขับของคุณมาถึงจุดนัดหมายแล้ว' });
+		} else {
+			await line.pushMessage(order.customer.userId, { type: 'text', text: 'สัตว์เลี้ยงของคุณอยู่ระหว่างดำเนินการส่ง' });
+		}
+		if (order.payment === line) {
+			await line.pushMessage(order.customer.userId, paymentTemplate(order, driver));
+		}
 	} else if (action === 'NOTBUY') {
-		manager.quotation.updateQuotationStatus(data, 2);
-		await replyMessage(event.replyToken, { type: 'text', text: 'แจ้งปฏิเสธคนขับแล้ว กำลังหาคนขับรายใหม่' });
+		updateQuotationStatus(data, 'rejected');
+		await line.replyMessage(event.replyToken, { type: 'text', text: 'แจ้งปฏิเสธคนขับแล้ว กรุณารอราคาจากคนขับคนอื่นๆ' });
 	} else if (action === 'BUY') {
-		manager.quotation.updateQuotationStatus(data, 1);
-		const quotation = await manager.quotation.getQuotationByCriteria({ _id: ObjectId(data) });
-		const order = await manager.order.getOrderByCriteria({ _id: ObjectId(quotation.order_id) });
-
-		await pushMessage(quotation.user_id, pickUpTemplate(order));
+		updateQuotationStatus(data, 'accepted');
+		await line.replyMessage(event.replyToken, { type: 'text', text: 'ยืนยันนัดหมายแล้ว ขอบคุณค่ะ' });
 	}
 }
 
