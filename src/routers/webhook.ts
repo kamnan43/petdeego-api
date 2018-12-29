@@ -22,22 +22,12 @@ export async function updateQuotationStatus(quotation_id, status) {
 				await manager.order.updateOrder(order._id, order);
 
 				// send msg to selected driver
-				// line.pushMessage(quotation.user_id, {
-				// 	type: 'text',
-				// 	text: `คุณได้รับเลือกจากคุณ [${order.customer.displayName}]\n \
-				// 	เบอร์ติดต่อ : ${order.customer.phone}\n \
-				// 	จาก : ${order.source.address}\n \
-				// 	ไป : ${order.destination.address}\n \
-				// 	เวลานัด : ${order.date}\n \
-				// 	ราคา : ${quotation.price}\n \
-				// 	ชำระโดย : ${order.payment === 'line' ? 'LINE Pay' : 'เงินสด'}`,
-				// });
 				await line.pushMessage(quotation.user_id, pickUpTemplate(order));
 
 				// send msg to other driver
 				const otherQt = await collection.find({
 					order_id: quotation.order_id,
-					_id: { $ne: quotation_id },
+					_id: { $ne: ObjectId(quotation_id) },
 				}).toArray();
 				otherQt.forEach(element => {
 					manager.quotation.updateQuotationStatus(element._id, 'rejected');
@@ -68,7 +58,7 @@ async function handlePostback(message, event) {
 		let orderId = data;
 		await manager.order.updateOrderStatus(orderId, 'pickedup');
 		let order = await manager.order.getOrderByCriteria({ _id: ObjectId(orderId) });
-		let driver = await manager.driver.getDriverById(order.driver_id);
+		let driver = await manager.driver.getDriverByUserId(order.driver_id);
 		if (order.owner === 1) {
 			await line.pushMessage(order.customer.userId, { type: 'text', text: 'คนขับของคุณมาถึงจุดนัดหมายแล้ว' });
 		} else {
