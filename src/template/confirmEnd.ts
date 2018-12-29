@@ -39,10 +39,6 @@ export function confirmEndTemplate(order) {
             layout: 'vertical',
             spacing: 'sm',
             margin: 'lg',
-            action: {
-              type: 'uri',
-              uri: `${order.source.address || '-'}`
-            },
             contents: [
               {
                 type: 'box',
@@ -64,10 +60,6 @@ export function confirmEndTemplate(order) {
                     color: '#666666',
                     wrap: true
                   },
-                  {
-                    type: 'image',
-                    url: 'https://azecomsa99.blob.core.windows.net/sims/common/google-maps.png'
-                  }
                 ]
               },
               {
@@ -90,10 +82,6 @@ export function confirmEndTemplate(order) {
                     color: '#666666',
                     wrap: true
                   },
-                  {
-                    type: 'image',
-                    url: 'https://azecomsa99.blob.core.windows.net/sims/common/google-maps.png'
-                  }
                 ]
               },
               {
@@ -174,7 +162,7 @@ export function confirmEndTemplate(order) {
                   },
                   {
                     type: 'text',
-                    text: `${order.price} บาท`,
+                    text: `${order.price || '-'} บาท`,
                     flex: 5,
                     size: 'sm',
                     color: '#666666'

@@ -38,7 +38,7 @@ export function paymentTemplate(order, driver, paymentUrl) {
               contents: [
                 {
                   type: 'text',
-                  text: `${order.price}฿`,
+                  text: `${order.price} บาท`,
                   margin: 'sm',
                   size: 'xxl',
                   align: 'center',

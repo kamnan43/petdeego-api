@@ -37,7 +37,7 @@ export function confirmQuotation (order, driver, quotation) {
                 contents: [
                   {
                     type: 'text',
-                    text: `${quotation.price}฿`,
+                    text: `${quotation.price} บาท`,
                     margin: 'sm',
                     size: 'xxl',
                     align: 'center',
