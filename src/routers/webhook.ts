@@ -110,7 +110,7 @@ async function handlePostback(message, event) {
 		let order = await manager.order.getOrderByCriteria({ _id: ObjectId(orderId) });
 		let driver = await manager.driver.getDriverByUserId(order.driver_id);
 		if (order.owner) {
-			await line.pushMessage(order.customer.userId, { type: 'text', text: 'คนขับของคุณมาถึงจุดนัดหมายแล้ว' });
+			await line.pushMessage(order.customer.userId, { type: 'text', text: 'คนขับของคุณมาถึงจุดนัดหมายแล้ว นะจ๊ะ' });
 		} else {
 			await line.pushMessage(order.customer.userId, { type: 'text', text: 'สัตว์เลี้ยงของคุณอยู่ระหว่างดำเนินการส่ง' });
 		}
@@ -128,8 +128,7 @@ async function handlePostback(message, event) {
 				console.log('reservePayment error', err);
 			}
 		}
-		const msgDropoff = confirmEndTemplate(order);
-		await line.pushMessage(order.driver_id, msgDropoff);
+		await line.pushMessage(driver.user_id, confirmEndTemplate(order));
 	} else if (action === 'NOTBUY') {
 		updateQuotationStatus(data, 'rejected');
 		await line.replyMessage(event.replyToken, { type: 'text', text: 'แจ้งปฏิเสธคนขับแล้ว กรุณารอราคาจากคนขับคนอื่นๆ' });
