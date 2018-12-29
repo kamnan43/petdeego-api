@@ -8,13 +8,14 @@ import { paymentTemplate } from '../template/payment';
 import { pickUpTemplate } from '../template/pickup'
 const { ObjectId } = require('mongodb');
 
-async function reservePayment(order): Promise<any> {
+async function reservePayment(order, driver): Promise<any> {
 	return new Promise((resolve, reject) => {
 		let { price, _id } = order
 		let url = `${config.linepay.api}/v2/payments/request`;
 
 		let payload = {
 			productName: 'PetdeeGo Fee',
+			productImageUrl: driver.image,
 			amount: price,
 			orderId: _id,
 			currency: 'THB',
@@ -104,7 +105,7 @@ async function handlePostback(message, event) {
 		}
 		if (order.payment === 'line') {
 			try {
-				const paymentRes = await reservePayment(order);
+				const paymentRes = await reservePayment(order, driver);
 				const paymentUrl = paymentRes.info.paymentUrl.web;
 				// update payment transaction
 				order.transactionId = paymentRes.info.transactionId + '';
