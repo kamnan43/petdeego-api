@@ -130,18 +130,18 @@ async function handleEvent(event) {
 	console.log('handleEvent', event);
 	const message = event.message;
 	switch (event.type) {
-		case 'message':
-			switch (message.type) {
-				// case 'text':
-				//     await handleText(message, event); break;
-				default:
-					throw new Error(`Unknown message: ${JSON.stringify(message)}`);
-			}
-			break;
+		// case 'message':
+		// 	switch (message.type) {
+		// 		// case 'text':
+		// 		//     await handleText(message, event); break;
+		// 		default:
+		// 			throw new Error(`Unknown message: ${JSON.stringify(message)}`);
+		// 	}
+		// 	break;
 		case 'postback':
 			await handlePostback(message, event); break;
 		default:
-			throw new Error(`Unknown event: ${JSON.stringify(event)}`);
+			// throw new Error(`Unknown event: ${JSON.stringify(event)}`);
 	}
 }
 
