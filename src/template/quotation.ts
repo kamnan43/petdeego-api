@@ -1,3 +1,5 @@
+import * as moment from 'moment';
+
 export function templateQuotation(order) {
 
   let petType = '';
@@ -70,10 +72,6 @@ export function templateQuotation(order) {
                     color: '#666666',
                     wrap: true
                   },
-                  {
-                    type: 'image',
-                    url: 'https://azecomsa99.blob.core.windows.net/sims/common/google-maps.png'
-                  }
                 ]
               },
               {
@@ -96,10 +94,6 @@ export function templateQuotation(order) {
                     color: '#666666',
                     wrap: true
                   },
-                  {
-                    type: 'image',
-                    url: 'https://azecomsa99.blob.core.windows.net/sims/common/google-maps.png'
-                  }
                 ]
               },
               {
@@ -116,7 +110,7 @@ export function templateQuotation(order) {
                   },
                   {
                     type: 'text',
-                    text: `${order.date || '-'} / ${order.time || '-'} `,
+                    text: `${order.date ? moment(order.date).format('DD/MM/YY') : '-'} / ${order.time || '-'} `,
                     flex: 5,
                     size: 'sm',
                     color: '#666666'
