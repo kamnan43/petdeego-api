@@ -103,18 +103,18 @@ async function handlePostback(message, event) {
 			await line.pushMessage(order.customer.userId, { type: 'text', text: 'สัตว์เลี้ยงของคุณอยู่ระหว่างดำเนินการส่ง' });
 		}
 		if (order.payment === 'line') {
-			reservePayment(order)
-				.then(async (paymentRes) => {
-					const paymentUrl = paymentRes.info.paymentUrl.web;
-					// update payment transaction
-					order.transactionId = paymentRes.info.transactionId;
-					await manager.order.updateOrder(orderId, order);
-					await line.pushMessage(order.customer.userId, paymentTemplate(order, driver, paymentUrl));
-				})
-				.catch(err => {
-
-				});
-
+			try {
+				const paymentRes = await reservePayment(order);
+				const paymentUrl = paymentRes.info.paymentUrl.web;
+				// update payment transaction
+				order.transactionId = paymentRes.info.transactionId + '';
+				await manager.order.updateOrder(orderId, order);
+				const msg = paymentTemplate(order, driver, paymentUrl);
+				console.log('Payment msg', msg);
+				await line.pushMessage(order.customer.userId, msg);
+			} catch (err) {
+				console.log('reservePayment error', err);
+			}
 		}
 	} else if (action === 'NOTBUY') {
 		updateQuotationStatus(data, 'rejected');
