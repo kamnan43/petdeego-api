@@ -110,7 +110,7 @@ export function templateQuotation(order) {
                   },
                   {
                     type: 'text',
-                    text: `${order.date ? moment(order.date).format('DD/MM/YY') : '-'} / ${order.time || '-'} `,
+                    text: `${order.date ? moment(order.date).format('DD/MM/YY') : '-'} เวลา ${order.time || '-'} `,
                     flex: 5,
                     size: 'sm',
                     color: '#666666'

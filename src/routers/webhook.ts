@@ -14,7 +14,7 @@ export async function updateQuotationStatus(quotation_id, status) {
 		let quotation = await collection.findOne({ _id: ObjectId(quotation_id) });
 		if (quotation) {
 			manager.quotation.updateQuotationStatus(quotation_id, status);
-			const order = await manager.order.getOrderByCriteria(quotation.order_id);
+			const order = await manager.order.getOrderByCriteria({ _id: ObjectId(quotation.order_id) });
 			if (status === 'accepted') {
 				// update order
 				order.driver_id = quotation.user_id;
