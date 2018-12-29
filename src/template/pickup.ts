@@ -1,3 +1,5 @@
+import * as moment from 'moment';
+
 export function pickUpTemplate(order) {
   let template = {
     type: 'flex',
@@ -37,10 +39,6 @@ export function pickUpTemplate(order) {
             layout: 'vertical',
             spacing: 'sm',
             margin: 'lg',
-            action: {
-              type: 'uri',
-              uri: `${order.source.address}`
-            },
             contents: [
               {
                 type: 'box',
@@ -62,10 +60,10 @@ export function pickUpTemplate(order) {
                     color: '#666666',
                     wrap: true
                   },
-                  {
-                    type: 'image',
-                    url: 'https://azecomsa99.blob.core.windows.net/sims/common/google-maps.png'
-                  }
+                  // {
+                  //   type: 'image',
+                  //   url: 'https://azecomsa99.blob.core.windows.net/sims/common/google-maps.png'
+                  // }
                 ]
               },
               {
@@ -88,10 +86,10 @@ export function pickUpTemplate(order) {
                     color: '#666666',
                     wrap: true
                   },
-                  {
-                    type: 'image',
-                    url: 'https://azecomsa99.blob.core.windows.net/sims/common/google-maps.png'
-                  }
+                  // {
+                  //   type: 'image',
+                  //   url: 'https://azecomsa99.blob.core.windows.net/sims/common/google-maps.png'
+                  // }
                 ]
               },
               {
@@ -108,7 +106,7 @@ export function pickUpTemplate(order) {
                   },
                   {
                     type: 'text',
-                    text: `${order.date ? order.date : '-' } / ${order.time ? order.time : '-'}`,
+                    text: `${order.date ? moment(order.date).format('DD/MM/YY') : '-' } / ${order.time ? order.time : '-'}`,
                     flex: 5,
                     size: 'sm',
                     color: '#666666'
@@ -172,7 +170,35 @@ export function pickUpTemplate(order) {
                   },
                   {
                     type: 'text',
-                    text: '200.00',
+                    text: `${order.price} บาท`,
+                    flex: 5,
+                    size: 'sm',
+                    color: '#666666'
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            type: 'box',
+            layout: 'vertical',
+            spacing: 'sm',
+            margin: 'lg',
+            contents: [
+              {
+                type: 'box',
+                layout: 'baseline',
+                spacing: 'sm',
+                contents: [
+                  {
+                    type: 'text',
+                    text: 'ชำระโดย',
+                    flex: 2,
+                    color: '#AAAAAA'
+                  },
+                  {
+                    type: 'text',
+                    text: order.payment === 'line' ? 'LINE Pay' : 'เงินสด',
                     flex: 5,
                     size: 'sm',
                     color: '#666666'
@@ -197,8 +223,8 @@ export function pickUpTemplate(order) {
             type: 'button',
             action: {
               type: 'postback',
-              label: 'pick up',
-              data: `updateorderstatus_${order._id}_3`
+              label: 'Pick Up',
+              data: `PICKUP_${order._id}`
             },
             color: '#00d5ca',
             height: 'sm',
