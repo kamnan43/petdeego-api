@@ -10,13 +10,13 @@ const { ObjectId } = require('mongodb');
 
 async function reservePayment(order): Promise<any> {
 	return new Promise((resolve, reject) => {
-		let { price, order_id } = order
+		let { price, _id } = order
 		let url = `${config.linepay.api}/v2/payments/request`;
 
 		let payload = {
 			productName: 'PetdeeGo Fee',
 			amount: price,
-			orderId: order_id,
+			orderId: _id,
 			currency: 'THB',
 			confirmUrl: `${config.apiUrl}/payment/confirm`,
 			langCd: 'th',
