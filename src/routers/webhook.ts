@@ -5,7 +5,9 @@ import { manager } from '../manager/manager';
 import * as line from '../utils/line';
 import { di } from '../di';
 import { paymentTemplate } from '../template/payment';
-import { pickUpTemplate } from '../template/pickup'
+import { pickUpTemplate } from '../template/pickup';
+import { confirmEndTemplate } from '../template/confirmEnd';
+
 const { ObjectId } = require('mongodb');
 
 async function reservePayment(order, driver): Promise<any> {
@@ -93,7 +95,16 @@ async function handlePostback(message, event) {
 	const action = postbackData[0];
 	const data = postbackData[1];
 	console.log('postbackData ===>', postbackData);
-	if (action === 'PICKUP') {
+	if (action === 'DROPOFF') {
+		let orderId = data;
+		await manager.order.updateOrderStatus(orderId, 'dropoff');
+		let order = await manager.order.getOrderByCriteria({ _id: ObjectId(orderId) });
+		if (order.owner) {
+			await line.pushMessage(order.customer.userId, { type: 'text', text: 'คนขับของคุณส่งถึงจุดหมายแล้ว' });
+		} else {
+			await line.pushMessage(order.customer.userId, { type: 'text', text: 'สัตว์เลี้ยงของคุณส่งถึงจุดหมายแล้ว' });
+		}
+	} else if (action === 'PICKUP') {
 		let orderId = data;
 		await manager.order.updateOrderStatus(orderId, 'pickedup');
 		let order = await manager.order.getOrderByCriteria({ _id: ObjectId(orderId) });
@@ -117,6 +128,8 @@ async function handlePostback(message, event) {
 				console.log('reservePayment error', err);
 			}
 		}
+		const msgDropoff = confirmEndTemplate(order);
+		await line.pushMessage(order.driver_id, msgDropoff);
 	} else if (action === 'NOTBUY') {
 		updateQuotationStatus(data, 'rejected');
 		await line.replyMessage(event.replyToken, { type: 'text', text: 'แจ้งปฏิเสธคนขับแล้ว กรุณารอราคาจากคนขับคนอื่นๆ' });

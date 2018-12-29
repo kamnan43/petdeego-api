@@ -1,4 +1,6 @@
-function confirmEndTemplate(order) {
+import * as moment from 'moment';
+
+export function confirmEndTemplate(order) {
   let template = {
     type: 'bubble',
     direction: 'ltr',
@@ -36,7 +38,7 @@ function confirmEndTemplate(order) {
           margin: 'lg',
           action: {
             type: 'uri',
-            uri: `${order.source.address}`
+            uri: `${order.source.address || '-'}`
           },
           contents: [
             {
@@ -53,7 +55,7 @@ function confirmEndTemplate(order) {
                 },
                 {
                   type: 'text',
-                  text: `${order.source.address}`,
+                  text: `${order.source.address || '-'}`,
                   flex: 4,
                   size: 'sm',
                   color: '#666666',
@@ -79,7 +81,7 @@ function confirmEndTemplate(order) {
                 },
                 {
                   type: 'text',
-                  text: `${order.destination.address}`,
+                  text: `${order.destination.address || '-'}`,
                   flex: 4,
                   size: 'sm',
                   color: '#666666',
@@ -105,7 +107,7 @@ function confirmEndTemplate(order) {
                 },
                 {
                   type: 'text',
-                  text: `${order.date / order.time}`,
+                  text: `${order.date ? moment(order.date).format('DD/MM/YY') : '-'} เวลา ${order.time || '-'} `,
                   flex: 5,
                   size: 'sm',
                   color: '#666666'
@@ -137,7 +139,7 @@ function confirmEndTemplate(order) {
                 },
                 {
                   type: 'text',
-                  text: `${order.customer.phone}`,
+                  text: `${order.customer.phone || '-'}`,
                   flex: 5,
                   size: 'sm',
                   color: '#666666'
@@ -169,7 +171,7 @@ function confirmEndTemplate(order) {
                 },
                 {
                   type: 'text',
-                  text: `${order.price}฿`,
+                  text: `${order.price} บาท`,
                   flex: 5,
                   size: 'sm',
                   color: '#666666'
@@ -193,9 +195,9 @@ function confirmEndTemplate(order) {
         {
           type: 'button',
           action: {
-            type: 'uri',
+            type: 'postback',
             label: 'ยืนยันถึงที่หมาย',
-            uri: 'https://linecorp.com'
+            data: `DROPOFF_${order._id}`
           },
           color: '#00d5ca',
           height: 'sm',
