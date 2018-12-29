@@ -10,17 +10,12 @@ export function confirmQuotation (order, driver, quotation) {
         url: `${driver.image}`,
         size: 'full',
         aspectRatio: '20:13',
-        aspectMode: 'cover',
+        aspectMode: 'fit',
       },
       body: {
         type: 'box',
         layout: 'vertical',
         spacing: 'md',
-        action: {
-          type: 'uri',
-          label: 'Action',
-          uri: 'https://linecorp.com'
-        },
         contents: [
           {
             type: 'text',
