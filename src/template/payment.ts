@@ -1,4 +1,4 @@
-export function paymentTemplate(order, driver) {
+export function paymentTemplate(order, driver, paymentUrl) {
   let template = {
     type: 'bubble',
     hero: {
@@ -64,7 +64,7 @@ export function paymentTemplate(order, driver) {
           action: {
             type: 'uri',
             label: 'ชำระเงิน',
-            uri: 'https://linecorp.com'
+            uri: paymentUrl
           },
           color: '#57B846',
           style: 'primary'

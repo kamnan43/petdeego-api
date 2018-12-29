@@ -1,10 +1,48 @@
 import * as express from 'express';
+import * as rp from 'request-promise';
+import { config } from '../config';
 import { manager } from '../manager/manager';
 import * as line from '../utils/line';
 import { di } from '../di';
 import { paymentTemplate } from '../template/payment';
 import { pickUpTemplate } from '../template/pickup'
 const { ObjectId } = require('mongodb');
+
+async function reservePayment(order): Promise<any> {
+	return new Promise((resolve, reject) => {
+		let { price, order_id } = order
+		let url = `${config.linepay.api}/v2/payments/request`;
+
+		let payload = {
+			productName: 'PetdeeGo Fee',
+			amount: price,
+			orderId: order_id,
+			currency: 'THB',
+			confirmUrl: `${config.apiUrl}/payment/confirm`,
+			langCd: 'th',
+			confirmUrlType: 'SERVER',
+		};
+		rp({
+			method: 'POST',
+			uri: url,
+			body: payload,
+			headers: line.getXLineHeader(),
+			json: true,
+		})
+			.then(function (response) {
+				console.log('response', JSON.stringify(response));
+				if (response && response.returnCode === '0000' && response.info) {
+					resolve(response);
+				} else {
+					reject(new Error('Reserve payment failed'));
+				}
+			})
+			.catch(function (err) {
+				console.log('payment err', err);
+				reject(err);
+			});
+	});
+}
 
 export async function updateQuotationStatus(quotation_id, status) {
 	try {
@@ -65,7 +103,18 @@ async function handlePostback(message, event) {
 			await line.pushMessage(order.customer.userId, { type: 'text', text: 'สัตว์เลี้ยงของคุณอยู่ระหว่างดำเนินการส่ง' });
 		}
 		if (order.payment === line) {
-			await line.pushMessage(order.customer.userId, paymentTemplate(order, driver));
+			reservePayment(order)
+				.then(async (paymentRes) => {
+					const paymentUrl = paymentRes.info.paymentUrl.web;
+					// update payment transaction
+					order.transactionId = paymentRes.info.transactionId;
+					await manager.order.updateOrder(orderId, order);
+					await line.pushMessage(order.customer.userId, paymentTemplate(order, driver, paymentUrl));
+				})
+				.catch(err => {
+
+				});
+
 		}
 	} else if (action === 'NOTBUY') {
 		updateQuotationStatus(data, 'rejected');
