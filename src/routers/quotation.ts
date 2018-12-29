@@ -2,7 +2,7 @@ import * as express from 'express';
 import { resp } from '../utils/resp';
 import { di } from '../di';
 import { manager } from '../manager/manager';
-import * as line from '../utils/line';
+// import * as line from '../utils/line';
 const { ObjectId } = require('mongodb');
 import { pushMessage } from '../utils/line';
 import { confirmQuotation } from '../template/confirmQuotation';
@@ -12,7 +12,7 @@ export const router = express.Router();
 router.get('/:userid/:orderid', getQuotation);
 router.get('/list', getQuotationList);
 router.post('/', saveQuotation);
-router.post('/update', updateQuotationStatus);
+// router.post('/update', updateQuotationStatus);
 
 export async function getQuotation(req, res, next) {
   let response = undefined;
@@ -96,40 +96,40 @@ export async function saveQuotation(req, res, next) {
   next(response);
 }
 
-export async function updateQuotationStatus(req, res, next) {
-  let response = undefined;
-  try {
-    let { body } = req;
-    let db = di.get('db');
-    let collection = db.collection('quotations');
+// export async function updateQuotationStatus(req, res, next) {
+//   let response = undefined;
+//   try {
+//     let { body } = req;
+//     let db = di.get('db');
+//     let collection = db.collection('quotations');
 
-    let data = await collection.find({ user_id: body.user_id, order_id: body.order_id }).sort().toArray();
-    if (data.length > 0) {
-      manager.quotation.updateQuotationStatus(data[0]._id, body.status);
-      if (body.status === 'accepted') {
-        let order = await manager.order.getOrderByCriteria(body.order_id);
-        order.driver_id = data.user_id;
-        order.price = data.price;
-        await manager.order.updateOrder(order._id, order);
-        data = await collection.find({ order_id: body.order_id }).sort().toArray();
-        data.forEach(element => {
-          if (element.user_id !== body.user_id) {
-            manager.quotation.updateQuotationStatus(element._id, 'rejected');
-            // Todo: push reject (element.user_id, 'rejected')
-            line.pushMessage(element.user_id, '');
-          } else {
-            // Todo: push accept (element.user_id, 'accepted')
-            line.pushMessage(element.user_id, '');
-          }
-        });
-      } else {
-        // Todo: push reject (data[0].user_id)
-        line.pushMessage(data[0].user_id, '');
-      }
-    }
-  } catch (err) {
-    console.log('err', err);
-    response = resp({ message: err.message }, 400);
-  }
-  next(response);
-}
+//     let data = await collection.find({ user_id: body.user_id, order_id: body.order_id }).sort().toArray();
+//     if (data.length > 0) {
+//       manager.quotation.updateQuotationStatus(data[0]._id, body.status);
+//       if (body.status === 'accepted') {
+//         let order = await manager.order.getOrderByCriteria(body.order_id);
+//         order.driver_id = data.user_id;
+//         order.price = data.price;
+//         await manager.order.updateOrder(order._id, order);
+//         data = await collection.find({ order_id: body.order_id }).sort().toArray();
+//         data.forEach(element => {
+//           if (element.user_id !== body.user_id) {
+//             manager.quotation.updateQuotationStatus(element._id, 'rejected');
+//             // Todo: push reject (element.user_id, 'rejected')
+//             line.pushMessage(element.user_id, '');
+//           } else {
+//             // Todo: push accept (element.user_id, 'accepted')
+//             line.pushMessage(element.user_id, '');
+//           }
+//         });
+//       } else {
+//         // Todo: push reject (data[0].user_id)
+//         line.pushMessage(data[0].user_id, '');
+//       }
+//     }
+//   } catch (err) {
+//     console.log('err', err);
+//     response = resp({ message: err.message }, 400);
+//   }
+//   next(response);
+// }
