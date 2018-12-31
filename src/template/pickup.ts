@@ -3,7 +3,7 @@ import * as moment from 'moment';
 export function pickUpTemplate(order) {
   let template = {
     type: 'flex',
-    altText: 'Flex Message',
+    altText: 'การเดินทางของคุณ',
     contents: {
       type: 'bubble',
       direction: 'ltr',
@@ -106,7 +106,7 @@ export function pickUpTemplate(order) {
                   },
                   {
                     type: 'text',
-                    text: `${order.date ? moment(order.date).format('DD/MM/YY') : '-' } / ${order.time ? order.time : '-'}`,
+                    text: `${order.date ? moment(order.date).format('DD/MM/YY HH:mm') : '-'}`,
                     flex: 5,
                     size: 'sm',
                     color: '#666666'

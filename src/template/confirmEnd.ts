@@ -3,7 +3,7 @@ import * as moment from 'moment';
 export function confirmEndTemplate(order) {
   let template = {
     type: 'flex',
-    altText: 'Flex Message',
+    altText: 'ยืนยันการถึงที่หมาย',
     contents: {
       type: 'bubble',
       direction: 'ltr',
@@ -20,7 +20,7 @@ export function confirmEndTemplate(order) {
             contents: [
               {
                 type: 'text',
-                text: 'Order',
+                text: 'การเดินทางของคุณ',
                 size: 'xl'
               }
             ]
@@ -98,7 +98,7 @@ export function confirmEndTemplate(order) {
                   },
                   {
                     type: 'text',
-                    text: `${order.date ? moment(order.date).format('DD/MM/YY') : '-'} เวลา ${order.time || '-'} `,
+                    text: `${order.date ? moment(order.date).format('DD/MM/YY HH:mm') : '-'}`,
                     flex: 5,
                     size: 'sm',
                     color: '#666666'

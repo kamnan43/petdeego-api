@@ -100,7 +100,7 @@ async function handlePostback(message, event) {
 		await manager.order.updateOrderStatus(orderId, 'dropoff');
 		let order = await manager.order.getOrderByCriteria({ _id: ObjectId(orderId) });
 		if (order.owner) {
-			await line.pushMessage(order.customer.userId, { type: 'text', text: 'คนขับของคุณส่งถึงจุดหมายแล้ว' });
+			await line.pushMessage(order.customer.userId, { type: 'text', text: 'คนขับส่งสัตว์เลี้ยงของคุณถึงจุดหมายแล้ว' });
 		} else {
 			await line.pushMessage(order.customer.userId, { type: 'text', text: 'สัตว์เลี้ยงของคุณส่งถึงจุดหมายแล้ว' });
 		}

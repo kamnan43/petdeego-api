@@ -2,7 +2,7 @@
 export function confirmQuotation (order, driver, quotation) {
   const template = {
     type: 'flex',
-    altText: 'Flex Message',
+    altText: 'ข้อเสนอราคานัดหมายของคุณ',
     contents: {
       type: 'bubble',
       hero: {

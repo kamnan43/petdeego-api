@@ -71,6 +71,7 @@ async function sendQuotationToUser(quoId) {
   console.log('order =====> ', order);
   console.log('line user Id ====> ', lineUserId);
   let message = await confirmQuotation(order, driver, quotation);
+  pushMessage(quotation.user_id, { type: 'text', text: 'คุณได้ยื่นเสนอราคาไปที่ลูกค้าแล้ว' });
   pushMessage(lineUserId, message)
   .catch((err) => {
     console.log('err', err.originalError.response.data);
