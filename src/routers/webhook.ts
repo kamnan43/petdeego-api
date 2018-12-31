@@ -63,6 +63,10 @@ export async function updateQuotationStatus(quotation_id, status) {
 				await manager.order.updateOrder(order._id, order);
 
 				// send msg to selected driver
+				await line.pushMessage(quotation.user_id, {
+					type: 'text',
+					text: `ลูกค้า [${order.customer.displayName}] ได้เลือกข้อเสนอของคุณ`,
+				})
 				await line.pushMessage(quotation.user_id, pickUpTemplate(order));
 
 				// send msg to other driver
@@ -110,7 +114,7 @@ async function handlePostback(message, event) {
 		let order = await manager.order.getOrderByCriteria({ _id: ObjectId(orderId) });
 		let driver = await manager.driver.getDriverByUserId(order.driver_id);
 		if (order.owner) {
-			await line.pushMessage(order.customer.userId, { type: 'text', text: 'คนขับของคุณมาถึงจุดนัดหมายแล้ว นะจ๊ะ' });
+			await line.pushMessage(order.customer.userId, { type: 'text', text: 'คนขับของคุณมาถึงจุดนัดหมายแล้ว' });
 		} else {
 			await line.pushMessage(order.customer.userId, { type: 'text', text: 'สัตว์เลี้ยงของคุณอยู่ระหว่างดำเนินการส่ง' });
 		}

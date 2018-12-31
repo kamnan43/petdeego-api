@@ -139,7 +139,7 @@ export function pickUpTemplate(order) {
                   },
                   {
                     type: 'text',
-                    text: `${order.customer.phone}`,
+                    text: `${order.customer.phone || '-'}`,
                     flex: 5,
                     size: 'sm',
                     color: '#666666'
