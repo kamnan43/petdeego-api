@@ -100,12 +100,14 @@ export async function saveQuotation(req, res, next) {
 
 async function validateOrderStatus(orderId) {
   let order = await manager.order.getOrderByCriteria({ _id: ObjectId(orderId)});
-  if (order.status === 'accepted') {
-    pushMessage(order.driver_id, {
-      type: 'text',
-      text: `รายการของคุณ [${order.customer.displayName}] ถูกยกเลิก เนื่องจากลูกค้าเลือกเรียกรถคนอื่นแล้ว`,
-    });
-    return true;
+  if (order) {
+    if (order.status === 'accepted') {
+      pushMessage(order.driver_id, {
+        type: 'text',
+        text: `รายการของคุณ [${order.customer.displayName}] ถูกยกเลิก เนื่องจากลูกค้าเลือกเรียกรถคนอื่นแล้ว`,
+      });
+      return true;
+    }
   }
   return false;
 }
