@@ -1,6 +1,7 @@
 import * as moment from 'moment';
 
 export function confirmEndTemplate(order) {
+  order.date = moment(order.date).add(7, 'hour').toDate();
   let template = {
     type: 'flex',
     altText: 'ยืนยันการถึงที่หมาย',

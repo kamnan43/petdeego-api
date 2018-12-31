@@ -1,7 +1,7 @@
 import * as moment from 'moment';
 
 export function templateQuotation(order) {
-
+  order.date = moment(order.date).add(7, 'hour').toDate();
   let petType = '';
   if (order.pet_type && order.pet_type.length) {
     order.pet_type.forEach(element => {
