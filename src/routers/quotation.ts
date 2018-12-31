@@ -86,11 +86,11 @@ export async function saveQuotation(req, res, next) {
     let collection = db.collection('quotations');
     body.created_at = new Date();
     body.status = 'quoted';
-    if (!validateOrderStatus(body.order_id)) {
-      let quo = await collection.insertOne(body);
-      sendQuotationToUser(quo.insertedId);
-      response = resp({ id: quo.insertedId }, 200);
-    }
+    // if (!validateOrderStatus(body.order_id)) {
+    let quo = await collection.insertOne(body);
+    sendQuotationToUser(quo.insertedId);
+    response = resp({ id: quo.insertedId }, 200);
+    // }
   } catch (err) {
     console.log('err', err);
     response = resp({ message: err.message }, 400);
