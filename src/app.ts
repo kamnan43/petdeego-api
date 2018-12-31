@@ -87,7 +87,7 @@ async function startServer() {
     ],
   }));
   app.get('/healthcheck', (req, res) => {
-    res.json({ message: 'petdeego-api ok v.0.0.0.0.1' });
+    res.json({ message: 'petdeego-api ok v.0.0.0.0.1 test message' });
   });
 
   app.use(async (req, res, next) => {
