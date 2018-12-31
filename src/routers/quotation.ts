@@ -61,28 +61,21 @@ export async function getQuotationList(req, res, next) {
 async function sendQuotationToUser(quoId) {
   const db = di.get('db');
   let quotation = await manager.quotation.getQuotationByCriteria({ _id: ObjectId(quoId)});
-  if (quotation.status !== 'rejected' ) {
-    console.log('quotation ====> ', quotation);
-    let order = await manager.order.getOrderByCriteria({ _id: ObjectId(quotation.order_id)});
-    console.log('order =====> ', order);
-    let driver = await manager.driver.getDriverByUserId(quotation.user_id);
-    console.log('driver =====> ', driver);
-    let lineUserId = order.customer.userId;
-    console.log('order =====> ', order);
-    console.log('line user Id ====> ', lineUserId);
-    let message = await confirmQuotation(order, driver, quotation);
-    pushMessage(quotation.user_id, { type: 'text', text: `คุณได้ยื่นเสนอราคา ${quotation.price} บาท ไปที่ลูกค้าแล้ว` });
-    pushMessage(lineUserId, message)
-    .catch((err) => {
-      console.log('err', err.originalError.response.data);
-    });
-    console.log('message ===> ', JSON.stringify(message));
-  } else {
-    pushMessage(quotation.customer.userId, {
-      type: 'text',
-      text: `รายการของคุณ [${quotation.customer.displayName}] ถูกยกเลิก เนื่องจากลูกค้าเลือกเรียกรถคนอื่นแล้ว`,
-    });
-  }
+  console.log('quotation ====> ', quotation);
+  let order = await manager.order.getOrderByCriteria({ _id: ObjectId(quotation.order_id)});
+  console.log('order =====> ', order);
+  let driver = await manager.driver.getDriverByUserId(quotation.user_id);
+  console.log('driver =====> ', driver);
+  let lineUserId = order.customer.userId;
+  console.log('order =====> ', order);
+  console.log('line user Id ====> ', lineUserId);
+  let message = await confirmQuotation(order, driver, quotation);
+  pushMessage(quotation.user_id, { type: 'text', text: `คุณได้ยื่นเสนอราคา ${quotation.price} บาท ไปที่ลูกค้าแล้ว` });
+  pushMessage(lineUserId, message)
+  .catch((err) => {
+    console.log('err', err.originalError.response.data);
+  });
+  console.log('message ===> ', JSON.stringify(message));
 }
 
 export async function saveQuotation(req, res, next) {
@@ -93,14 +86,28 @@ export async function saveQuotation(req, res, next) {
     let collection = db.collection('quotations');
     body.created_at = new Date();
     body.status = 'quoted';
-    let quo = await collection.insertOne(body);
-    sendQuotationToUser(quo.insertedId);
-    response = resp({ id: quo.insertedId }, 200);
+    if (!validateOrderStatus(body.order_id)) {
+      let quo = await collection.insertOne(body);
+      sendQuotationToUser(quo.insertedId);
+      response = resp({ id: quo.insertedId }, 200);
+    }
   } catch (err) {
     console.log('err', err);
     response = resp({ message: err.message }, 400);
   }
   next(response);
+}
+
+async function validateOrderStatus(orderId) {
+  let order = await manager.order.getOrderByCriteria({ _id: ObjectId(orderId)});
+  if (order.status === 'accepted') {
+    pushMessage(order.driver_id, {
+      type: 'text',
+      text: `รายการของคุณ [${order.customer.displayName}] ถูกยกเลิก เนื่องจากลูกค้าเลือกเรียกรถคนอื่นแล้ว`,
+    });
+    return true;
+  }
+  return false;
 }
 
 // export async function updateQuotationStatus(req, res, next) {
