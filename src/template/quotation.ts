@@ -1,7 +1,6 @@
-import * as moment from 'moment';
+import { displayDatetime } from '../utils/datetime';
 
 export function templateQuotation(order) {
-  order.date = moment(order.date).add(7, 'hour').toDate();
   let petType = '';
   if (order.pet_type && order.pet_type.length) {
     order.pet_type.forEach(element => {
@@ -110,7 +109,7 @@ export function templateQuotation(order) {
                   },
                   {
                     type: 'text',
-                    text: `${order.date ? moment(order.date).format('DD/MM/YY HH:mm') : '-'}`,
+                    text: `${order.date ? displayDatetime(order.date) : '-'}`,
                     flex: 5,
                     size: 'sm',
                     color: '#666666'
