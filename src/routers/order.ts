@@ -4,6 +4,7 @@ import { resp } from '../utils/resp';
 import { manager } from '../manager/manager';
 import { pushMessage } from '../utils/line';
 import { templateQuotation } from '../template/quotation';
+import { setTimeToGMT } from '../utils/datetime';
 
 export const router = express.Router();
 
@@ -17,6 +18,7 @@ async function sendOrderToDriver(order) {
 
   console.log('order =====> ', order);
   console.log('drivers ====> ', drivers);
+  order.date = setTimeToGMT(order.date);
   drivers.forEach(async (driver) => {
     const message = await templateQuotation(order);
 
