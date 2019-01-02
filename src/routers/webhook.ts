@@ -7,6 +7,7 @@ import { di } from '../di';
 import { paymentTemplate } from '../template/payment';
 import { pickUpTemplate } from '../template/pickup';
 import { confirmEndTemplate } from '../template/confirmEnd';
+import { setTimeToGMT } from '../utils/datetime';
 
 const { ObjectId } = require('mongodb');
 
@@ -67,6 +68,7 @@ export async function updateQuotationStatus(quotation_id, status) {
 					type: 'text',
 					text: `ลูกค้า [${order.customer.displayName}] ได้เลือกข้อเสนอของคุณ`,
 				})
+				order.date = setTimeToGMT(order.date);
 				await line.pushMessage(quotation.user_id, pickUpTemplate(order));
 
 				// send msg to other driver
@@ -132,6 +134,7 @@ async function handlePostback(message, event) {
 				console.log('reservePayment error', err);
 			}
 		}
+		order.date = setTimeToGMT(order.date);
 		await line.pushMessage(driver.user_id, confirmEndTemplate(order));
 	} else if (action === 'NOTBUY') {
 		updateQuotationStatus(data, 'rejected');

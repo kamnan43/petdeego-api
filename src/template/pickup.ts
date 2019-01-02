@@ -1,7 +1,6 @@
-import * as moment from 'moment';
+import { displayDatetime } from '../utils/datetime';
 
 export function pickUpTemplate(order) {
-  order.date = moment(order.date).add(7, 'hour').toDate();
   let template = {
     type: 'flex',
     altText: 'การเดินทางของคุณ',
@@ -107,7 +106,7 @@ export function pickUpTemplate(order) {
                   },
                   {
                     type: 'text',
-                    text: `${order.date ? moment(order.date).format('DD/MM/YY HH:mm') : '-'}`,
+                    text: `${order.date ? displayDatetime(order.date) : '-'}`,
                     flex: 5,
                     size: 'sm',
                     color: '#666666'

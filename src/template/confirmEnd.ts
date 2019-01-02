@@ -1,4 +1,4 @@
-import * as moment from 'moment';
+import { displayDatetime } from '../utils/datetime';
 
 export function confirmEndTemplate(order) {
   order.date = moment(order.date).add(7, 'hour').toDate();
@@ -99,7 +99,7 @@ export function confirmEndTemplate(order) {
                   },
                   {
                     type: 'text',
-                    text: `${order.date ? moment(order.date).format('DD/MM/YY HH:mm') : '-'}`,
+                    text: `${order.date ? displayDatetime(order.date) : '-'}`,
                     flex: 5,
                     size: 'sm',
                     color: '#666666'
