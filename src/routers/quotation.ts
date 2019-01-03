@@ -86,30 +86,15 @@ export async function saveQuotation(req, res, next) {
     let collection = db.collection('quotations');
     body.created_at = new Date();
     body.status = 'quoted';
-    // if (!validateOrderStatus(body.order_id)) {
+    console.log(body);
     let quo = await collection.insertOne(body);
     sendQuotationToUser(quo.insertedId);
     response = resp({ id: quo.insertedId }, 200);
-    // }
   } catch (err) {
     console.log('err', err);
     response = resp({ message: err.message }, 400);
   }
   next(response);
-}
-
-async function validateOrderStatus(orderId) {
-  let order = await manager.order.getOrderByCriteria({ _id: ObjectId(orderId)});
-  if (order) {
-    if (order.status === 'accepted') {
-      pushMessage(order.driver_id, {
-        type: 'text',
-        text: `รายการของคุณ [${order.customer.displayName}] ถูกยกเลิก เนื่องจากลูกค้าเลือกเรียกรถคนอื่นแล้ว`,
-      });
-      return true;
-    }
-  }
-  return false;
 }
 
 // export async function updateQuotationStatus(req, res, next) {
