@@ -16,13 +16,13 @@ async function sendOrderToDriver(order) {
   const db = di.get('db');
   const drivers = await db.collection('drivers').find({}).toArray();
 
-  console.log('order =====> ', order);
-  console.log('drivers ====> ', drivers);
+  // console.log('order =====> ', order);
+  // console.log('drivers ====> ', drivers);
   order.date = setTimeToGMT(order.date);
   drivers.forEach(async (driver) => {
     const message = await templateQuotation(order);
 
-    console.log('message ===> ', JSON.stringify(message));
+    // console.log('message ===> ', JSON.stringify(message));
     pushMessage(driver.user_id, message)
       .catch((err) => {
         console.log('err', err.originalError.response.data);

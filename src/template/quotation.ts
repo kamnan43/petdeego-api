@@ -111,7 +111,7 @@ export async function templateQuotation(order) {
               },
               {
                 type: 'box',
-                layout: 'horizontal',
+                layout: 'baseline',
                 spacing: 'sm',
                 contents: [
                   {
@@ -123,17 +123,15 @@ export async function templateQuotation(order) {
                   },
                   {
                     type: 'text',
-                    text: distance ? `${distance} กม. (โดยประมาณ)` : 'N/A',
-                    flex: 5,
+                    text: distance ? `${distance} (โดยประมาณ)` : 'N/A',
+                    flex: 4,
                     size: 'sm',
                     color: '#666666',
                     wrap: true
                   },
                   {
-                    type: 'image',
+                    type: 'icon',
                     url: 'https://azecomsa99.blob.core.windows.net/sims/common/google-maps.png',
-                    flex: 1,
-                    gravity: 'bottom',
                   }
                 ],
                 action: {
@@ -191,14 +189,14 @@ export async function templateQuotation(order) {
                 contents: [
                   {
                     type: 'text',
-                    text: 'เจ้าของไปด้วย',
+                    text: 'เจ้าของ',
                     flex: 2,
                     size: 'sm',
                     color: '#AAAAAA'
                   },
                   {
                     type: 'text',
-                    text: `${order.owner ? 'ใช่' : 'ไม่ใช่'}`,
+                    text: `${order.owner ? 'เดินทางไปด้วย' : 'ไม่ได้ไปด้วย'}`,
                     flex: 5,
                     size: 'sm',
                     color: '#666666'
@@ -306,7 +304,7 @@ export async function templateQuotation(order) {
                   {
                     type: 'text',
                     text: `${order.customer.phone || 'ไม่ระบุ'}`,
-                    flex: 5,
+                    flex: 4,
                     size: 'sm',
                     color: '#666666'
                   },
