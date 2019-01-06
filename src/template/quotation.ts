@@ -130,9 +130,10 @@ export async function templateQuotation(order) {
                     wrap: true
                   },
                   {
-                    type: 'icon',
+                    type: 'image',
                     url: 'https://azecomsa99.blob.core.windows.net/sims/common/google-maps.png',
-                    size: 'xxl',
+                    flex: 1,
+                    gravity: 'bottom',
                   }
                 ],
                 action: {
@@ -310,9 +311,10 @@ export async function templateQuotation(order) {
                     color: '#666666'
                   },
                   {
-                    type: 'icon',
+                    type: 'image',
                     url: 'https://iconsplace.com/wp-content/uploads/_icons/000000/256/png/phone-icon-256.png',
-                    size: 'xxl',
+                    flex: 1,
+                    gravity: 'bottom',
                   }
                 ],
                 action: {
