@@ -28,6 +28,7 @@ const config = {
     channelSecret: 'e4804d3d1a51bb8a01058ffd76ecf9fd'
   },
   apiUrl: 'https://petdee-api.alphaem-dev.tech/api/v1',
+  googleAppKey: 'AIzaSyBs77oWyIEnm2pD2LiwCVA6YRv-0_Rjgjs',
 };
 
 export default config;

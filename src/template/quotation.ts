@@ -1,16 +1,20 @@
 import { displayDatetime } from '../utils/datetime';
+import { getDirectionUrl, getDistance } from '../utils/googlemap';
 
-export function templateQuotation(order) {
-  let petType = '';
+export async function templateQuotation(order) {
+  let petType = 'อื่นๆ';
   if (order.pet_type && order.pet_type.length) {
-    order.pet_type.forEach(element => {
+    petType = order.pet_type.map(element => {
       if (element === 'cat') {
-        petType += ' แมว';
+        return 'แมว';
       } else if (element === 'dog') {
-        petType += ' สุนัข';
+        return 'สุนัข';
       }
-    });
+    }).join(', ');
   }
+
+  const directionUrl = getDirectionUrl(`${order.source.lat},${order.source.lng}`, `${order.destination.lat},${order.destination.lng}`);
+  const distance = await getDistance(`${order.source.lat},${order.source.lng}`, `${order.destination.lat},${order.destination.lng}`);
 
   let template = {
     type: 'flex',
@@ -66,12 +70,17 @@ export function templateQuotation(order) {
                   {
                     type: 'text',
                     text: `${order.source.address || '-'}`,
-                    flex: 4,
+                    flex: 5,
                     size: 'sm',
                     color: '#666666',
                     wrap: true
                   },
-                ]
+                ],
+                action: {
+                  type: 'uri',
+                  label: 'แผนที่',
+                  uri: `${directionUrl}`,
+                },
               },
               {
                 type: 'box',
@@ -88,12 +97,49 @@ export function templateQuotation(order) {
                   {
                     type: 'text',
                     text: `${order.destination.address || '-'}`,
-                    flex: 4,
+                    flex: 5,
                     size: 'sm',
                     color: '#666666',
                     wrap: true
                   },
-                ]
+                ],
+                action: {
+                  type: 'uri',
+                  label: 'แผนที่',
+                  uri: `${directionUrl}`,
+                },
+              },
+              {
+                type: 'box',
+                layout: 'horizontal',
+                spacing: 'sm',
+                contents: [
+                  {
+                    type: 'text',
+                    text: 'ระยะทาง',
+                    flex: 2,
+                    size: 'sm',
+                    color: '#AAAAAA'
+                  },
+                  {
+                    type: 'text',
+                    text: distance ? `${distance} กม. (โดยประมาณ)` : 'N/A',
+                    flex: 5,
+                    size: 'sm',
+                    color: '#666666',
+                    wrap: true
+                  },
+                  {
+                    type: 'icon',
+                    url: 'https://azecomsa99.blob.core.windows.net/sims/common/google-maps.png',
+                    size: 'xxl',
+                  }
+                ],
+                action: {
+                  type: 'uri',
+                  label: 'แผนที่',
+                  uri: `${directionUrl}`,
+                },
               },
               {
                 type: 'box',
@@ -123,7 +169,7 @@ export function templateQuotation(order) {
                 contents: [
                   {
                     type: 'text',
-                    text: 'ชำระเงิน',
+                    text: 'วิธีชำระเงิน',
                     flex: 2,
                     size: 'sm',
                     color: '#AAAAAA'
@@ -131,6 +177,27 @@ export function templateQuotation(order) {
                   {
                     type: 'text',
                     text: `${order.payment === 'cash' ? 'เงินสด' : 'Line Pay'}`,
+                    flex: 5,
+                    size: 'sm',
+                    color: '#666666'
+                  }
+                ]
+              },
+              {
+                type: 'box',
+                layout: 'baseline',
+                spacing: 'sm',
+                contents: [
+                  {
+                    type: 'text',
+                    text: 'เจ้าของไปด้วย',
+                    flex: 2,
+                    size: 'sm',
+                    color: '#AAAAAA'
+                  },
+                  {
+                    type: 'text',
+                    text: `${order.owner ? 'ใช่' : 'ไม่ใช่'}`,
                     flex: 5,
                     size: 'sm',
                     color: '#666666'
@@ -163,7 +230,7 @@ export function templateQuotation(order) {
                   },
                   {
                     type: 'text',
-                    text: `${petType || '-'}`,
+                    text: petType,
                     flex: 5,
                     size: 'sm',
                     color: '#666666'
@@ -184,7 +251,7 @@ export function templateQuotation(order) {
                   },
                   {
                     type: 'text',
-                    text: `${order.qty || '-'}`,
+                    text: `${order.qty || 'ไม่ระบุ'}`,
                     flex: 5,
                     size: 'sm',
                     color: '#666666'
@@ -237,12 +304,22 @@ export function templateQuotation(order) {
                   },
                   {
                     type: 'text',
-                    text: `${order.customer.phone || '-'}`,
+                    text: `${order.customer.phone || 'ไม่ระบุ'}`,
                     flex: 5,
                     size: 'sm',
                     color: '#666666'
+                  },
+                  {
+                    type: 'icon',
+                    url: 'https://iconsplace.com/wp-content/uploads/_icons/000000/256/png/phone-icon-256.png',
+                    size: 'xxl',
                   }
-                ]
+                ],
+                action: {
+                  type: 'uri',
+                  label: 'โทร',
+                  uri: `tel:${order.customer.phone}`,
+                },
               }
             ]
           },
