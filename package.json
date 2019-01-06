@@ -68,7 +68,7 @@
   "scripts": {
     "clean": "rm -rf dist",
     "build": "node_modules/.bin/tsc",
-    "start": "set NODE_ENV=localhost & nodemon --exec ts-node src/app.ts",
+    "start": "npm run build && set NODE_ENV=localhost & nodemon --exec ts-node dist/app.js",
     "loadtest": "artillery run -o loadtest.json loadtest.yml & artillery report loadtest.json",
     "loadtest-debug": "set DEBUG=http,http:response & artillery run loadtest.yml"
   }
