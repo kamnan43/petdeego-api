@@ -311,10 +311,8 @@ export async function templateQuotation(order) {
                     color: '#666666'
                   },
                   {
-                    type: 'image',
+                    type: 'icon',
                     url: 'https://iconsplace.com/wp-content/uploads/_icons/000000/256/png/phone-icon-256.png',
-                    flex: 1,
-                    gravity: 'bottom',
                   }
                 ],
                 action: {
