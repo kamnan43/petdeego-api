@@ -7,11 +7,6 @@ export function paymentTemplate(order, driver, paymentUrl) {
       size: 'full',
       aspectRatio: '20:13',
       aspectMode: 'fit',
-      // action: {
-      //   type: 'uri',
-      //   label: 'Action',
-      //   uri: 'https://linecorp.com'
-      // }
     },
     body: {
       type: 'box',

@@ -1,6 +1,10 @@
 import { displayDatetime } from '../utils/datetime';
+import { getDirectionUrl, getDistance } from '../utils/googlemap';
 
-export function pickUpTemplate(order) {
+export async function pickUpTemplate(order) {
+  const directionUrl = getDirectionUrl(`${order.source.lat},${order.source.lng}`, `${order.destination.lat},${order.destination.lng}`);
+  const distance = await getDistance(`${order.source.lat},${order.source.lng}`, `${order.destination.lat},${order.destination.lng}`);
+
   let template = {
     type: 'flex',
     altText: 'การเดินทางของคุณ',
@@ -54,17 +58,18 @@ export function pickUpTemplate(order) {
                   },
                   {
                     type: 'text',
-                    text: `${order.source.address}`,
-                    flex: 4,
+                    text: `${order.source.address || '-'}`,
+                    flex: 5,
                     size: 'sm',
                     color: '#666666',
                     wrap: true
                   },
-                  // {
-                  //   type: 'image',
-                  //   url: 'https://azecomsa99.blob.core.windows.net/sims/common/google-maps.png'
-                  // }
-                ]
+                ],
+                action: {
+                  type: 'uri',
+                  label: 'แผนที่',
+                  uri: `${directionUrl}`,
+                },
               },
               {
                 type: 'box',
@@ -80,17 +85,49 @@ export function pickUpTemplate(order) {
                   },
                   {
                     type: 'text',
-                    text: `${order.destination.address}`,
+                    text: `${order.destination.address || '-'}`,
+                    flex: 5,
+                    size: 'sm',
+                    color: '#666666',
+                    wrap: true
+                  },
+                ],
+                action: {
+                  type: 'uri',
+                  label: 'แผนที่',
+                  uri: `${directionUrl}`,
+                },
+              },
+              {
+                type: 'box',
+                layout: 'baseline',
+                spacing: 'sm',
+                contents: [
+                  {
+                    type: 'text',
+                    text: 'ระยะทาง',
+                    flex: 2,
+                    size: 'sm',
+                    color: '#AAAAAA'
+                  },
+                  {
+                    type: 'text',
+                    text: distance ? `${distance} (โดยประมาณ)` : 'N/A',
                     flex: 4,
                     size: 'sm',
                     color: '#666666',
                     wrap: true
                   },
-                  // {
-                  //   type: 'image',
-                  //   url: 'https://azecomsa99.blob.core.windows.net/sims/common/google-maps.png'
-                  // }
-                ]
+                  {
+                    type: 'icon',
+                    url: 'https://azecomsa99.blob.core.windows.net/sims/common/google-maps.png',
+                  }
+                ],
+                action: {
+                  type: 'uri',
+                  label: 'แผนที่',
+                  uri: `${directionUrl}`,
+                },
               },
               {
                 type: 'box',

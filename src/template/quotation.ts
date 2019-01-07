@@ -18,7 +18,7 @@ export async function templateQuotation(order) {
 
   let template = {
     type: 'flex',
-    altText: 'Flex Message',
+    altText: 'การเดินทางของคุณ',
     contents: {
       type: 'bubble',
       direction: 'ltr',
