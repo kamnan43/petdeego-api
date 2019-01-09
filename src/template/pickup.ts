@@ -176,11 +176,20 @@ export async function pickUpTemplate(order) {
                   {
                     type: 'text',
                     text: `${order.customer.phone || '-'}`,
-                    flex: 5,
+                    flex: 4,
                     size: 'sm',
                     color: '#666666'
+                  },
+                  {
+                    type: 'icon',
+                    url: 'https://iconsplace.com/wp-content/uploads/_icons/000000/256/png/phone-icon-256.png',
                   }
-                ]
+                ],
+                action: {
+                  type: 'uri',
+                  label: 'โทร',
+                  uri: `tel:${order.customer.phone}`,
+                },
               }
             ]
           },
@@ -231,6 +240,7 @@ export async function pickUpTemplate(order) {
                     type: 'text',
                     text: 'ชำระโดย',
                     flex: 2,
+                    size: 'sm',
                     color: '#AAAAAA'
                   },
                   {

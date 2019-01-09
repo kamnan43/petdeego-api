@@ -176,7 +176,7 @@ export function confirmEndTemplate(order) {
                 contents: [
                   {
                     type: 'text',
-                    text: 'วิธีชำระเงิน',
+                    text: 'ชำระ',
                     flex: 2,
                     color: '#AAAAAA'
                   },
@@ -195,7 +195,6 @@ export function confirmEndTemplate(order) {
                 text: order.payment === 'cash' ? 'อย่าลืม!! รับชำระเป็นเงินสด' : 'อย่าลืม!! ตรวจสอบการชำระเงินผ่าน LINE Pay',
                 color: '#AAAAAA',
                 weight: 'bold',
-                size: 'xl',
               },
             ]
           },

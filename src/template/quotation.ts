@@ -168,7 +168,7 @@ export async function templateQuotation(order) {
                 contents: [
                   {
                     type: 'text',
-                    text: 'วิธีชำระเงิน',
+                    text: 'ชำระโดย',
                     flex: 2,
                     size: 'sm',
                     color: '#AAAAAA'
