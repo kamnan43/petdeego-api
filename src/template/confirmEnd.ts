@@ -55,7 +55,7 @@ export function confirmEndTemplate(order) {
                   {
                     type: 'text',
                     text: `${order.source.address || '-'}`,
-                    flex: 4,
+                    flex: 5,
                     size: 'sm',
                     color: '#666666',
                     wrap: true
@@ -77,7 +77,7 @@ export function confirmEndTemplate(order) {
                   {
                     type: 'text',
                     text: `${order.destination.address || '-'}`,
-                    flex: 4,
+                    flex: 5,
                     size: 'sm',
                     color: '#666666',
                     wrap: true
@@ -176,7 +176,7 @@ export function confirmEndTemplate(order) {
                 contents: [
                   {
                     type: 'text',
-                    text: 'ชำระ',
+                    text: 'ชำระโดย',
                     flex: 2,
                     color: '#AAAAAA'
                   },
@@ -192,7 +192,7 @@ export function confirmEndTemplate(order) {
               },
               {
                 type: 'text',
-                text: order.payment === 'cash' ? 'อย่าลืม!! รับชำระเป็นเงินสด' : 'อย่าลืม!! ตรวจสอบการชำระเงินผ่าน LINE Pay',
+                text: order.payment === 'cash' ? 'อย่าลืม!! รับชำระเป็นเงินสด' : 'อย่าลืม!! ตรวจสอบการชำระเงิน',
                 color: '#AAAAAA',
                 weight: 'bold',
               },
@@ -214,7 +214,7 @@ export function confirmEndTemplate(order) {
             type: 'button',
             action: {
               type: 'postback',
-              label: 'ยืนยันถึงที่หมาย (ได้รับเงินเรียบร้อยแล้ว)',
+              label: 'ยืนยันถึงที่หมาย (ได้รับเงินแล้ว)',
               data: `DROPOFF_${order._id}`
             },
             color: '#00d5ca',
