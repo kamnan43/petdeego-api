@@ -69,7 +69,9 @@ export async function updateQuotationStatus(quotation_id, status) {
 					text: `ลูกค้า [${order.customer.displayName}] ได้เลือกข้อเสนอของคุณ`,
 				})
 				order.date = setTimeToGMT(order.date);
-				await line.pushMessage(quotation.user_id, pickUpTemplate(order));
+				const msg = await pickUpTemplate(order);
+				console.log('pickUpTemplate', msg);
+				await line.pushMessage(quotation.user_id, msg);
 
 				// send msg to other driver
 				const otherQt = await collection.find({
