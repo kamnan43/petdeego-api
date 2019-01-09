@@ -168,7 +168,35 @@ export function confirmEndTemplate(order) {
                     color: '#666666'
                   }
                 ]
-              }
+              },
+              {
+                type: 'box',
+                layout: 'baseline',
+                spacing: 'sm',
+                contents: [
+                  {
+                    type: 'text',
+                    text: 'วิธีชำระเงิน',
+                    flex: 2,
+                    color: '#AAAAAA'
+                  },
+                  {
+                    type: 'text',
+                    text: `${order.payment === 'cash' ? 'เงินสด' : 'Line Pay'}`,
+                    flex: 5,
+                    weight: 'bold',
+                    size: 'xl',
+                    color: '#666666'
+                  }
+                ]
+              },
+              {
+                type: 'text',
+                text: order.payment === 'cash' ? 'อย่าลืม!! รับชำระเป็นเงินสด' : 'อย่าลืม!! ตรวจสอบการชำระเงินผ่าน LINE Pay',
+                color: '#AAAAAA',
+                weight: 'bold',
+                size: 'xl',
+              },
             ]
           },
           {
@@ -187,7 +215,7 @@ export function confirmEndTemplate(order) {
             type: 'button',
             action: {
               type: 'postback',
-              label: 'ยืนยันถึงที่หมาย',
+              label: 'ยืนยันถึงที่หมาย (ได้รับเงินเรียบร้อยแล้ว)',
               data: `DROPOFF_${order._id}`
             },
             color: '#00d5ca',
