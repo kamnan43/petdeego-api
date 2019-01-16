@@ -1,0 +1,21 @@
+version: '2'
+services:
+  petdee-api:
+    restart: always
+    extends:
+      file: base.yml
+      service: node
+    expose:
+      - 5001
+    volumes:
+      - ../dist:/app/dist
+      - ../node_modules:/app/node_modules
+    environment:
+      NODE_ENV: 'develop'
+      VIRTUAL_PORT: 5001
+      VIRTUAL_HOST: 'petdee-api.alphaem-dev.tech'
+
+networks:
+  default:
+    external:
+      name: sandbox_network
