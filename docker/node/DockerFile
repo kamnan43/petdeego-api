@@ -4,5 +4,5 @@ RUN mkdir /app
 WORKDIR /app
 
 RUN npm install -g pm2
-s
+
 CMD ["pm2-docker", "start", "dist/app.js", "--instances", "1"]
