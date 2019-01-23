@@ -5,8 +5,8 @@ services:
     extends:
       file: base.yml
       service: node
-    ports:
-      - "5001:5001"
+    expose:
+      - 5001
     volumes:
       - ../dist:/app/dist
       - ../node_modules:/app/node_modules
