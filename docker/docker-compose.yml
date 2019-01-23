@@ -13,7 +13,7 @@ services:
     environment:
       NODE_ENV: 'develop'
       VIRTUAL_PORT: 5001
-      VIRTUAL_HOST: 'petdee-api.alphaem-dev.tech'
+      VIRTUAL_HOST: 'api.petdee.tech'
 
 networks:
   default:
