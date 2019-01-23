@@ -1,11 +1,12 @@
 const config = {
   mongodb: {
-    host: 'alphaem.documents.azure.com',
-    port: 10255,
+    cluster: 'cluster0-shard-00-00-t0qef.mongodb.net:27017,cluster0-shard-00-01-t0qef.mongodb.net:27017,cluster0-shard-00-02-t0qef.mongodb.net:27017',
+    // host: 'alphaem.documents.azure.com',
+    // port: 10255,
     username: 'alphaem',
     password: '5pDTAqhBHw2RjWxScXRY7rjEloG5Q47ewTfI6vuZOu2BP3lVKez1RihhLhhBYyX608NBHOPSqBTSDu0nyasuLQ==',
     database: 'admin',
-    qs: '?ssl=true&sslverifycertificate=false',
+    qs: '?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin&retryWrites=true',
   },
   jwt: {
     secret: '25237FA87A9E911E420BB460716A192689970035F99264CECD77B1E679567145',
@@ -27,7 +28,7 @@ const config = {
     channelId: '1634637036',
     channelSecret: 'e4804d3d1a51bb8a01058ffd76ecf9fd'
   },
-  apiUrl: 'https://petdee-api.alphaem-dev.tech/api/v1',
+  apiUrl: 'https://api.petdee.tech/api/v1',
   googleAppKey: 'AIzaSyBs77oWyIEnm2pD2LiwCVA6YRv-0_Rjgjs',
 };
 
