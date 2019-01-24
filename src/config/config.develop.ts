@@ -5,7 +5,7 @@ const config = {
     // port: 10255,
     username: 'alphaem',
     password: '5pDTAqhBHw2RjWxScXRY7rjEloG5Q47ewTfI6vuZOu2BP3lVKez1RihhLhhBYyX608NBHOPSqBTSDu0nyasuLQ==',
-    database: 'admin',
+    database: 'petdee',
     qs: '?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin&retryWrites=true',
   },
   jwt: {
