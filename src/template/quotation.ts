@@ -123,7 +123,7 @@ export async function templateQuotation(order) {
                   },
                   {
                     type: 'text',
-                    text: distance ? `${distance} (โดยประมาณ)` : 'N/A',
+                    text: distance ? `${distance.text} (โดยประมาณ)` : 'N/A',
                     flex: 4,
                     size: 'sm',
                     color: '#666666',

@@ -5,12 +5,14 @@ import { manager } from '../manager/manager';
 import { pushMessage } from '../utils/line';
 import { templateQuotation } from '../template/quotation';
 import { setTimeToGMT } from '../utils/datetime';
+import { getDistance } from '../utils/googlemap';
 
 export const router = express.Router();
 
 router.get('/', getOrder);
 router.post('/', createOrder);
 router.get('/update/:orderid/:status', updateOrderStatus);
+router.get('/calculate/:from/:to', calculate);
 
 async function sendOrderToDriver(order) {
   const db = di.get('db');
@@ -77,6 +79,20 @@ export async function updateOrderStatus(req, res, next) {
     let { orderid, status } = req.params;
     await manager.order.updateOrderStatus(orderid, status);
     response = resp({ result: 'success' }, 200);
+  } catch (err) {
+    console.log('err', err);
+    response = resp({ message: err.message }, 400);
+  }
+  next(response);
+}
+
+export async function calculate(req, res, next) {
+  let response = undefined;
+  try {
+    let { from, to } = req.params;
+    const distance = await getDistance(from, to);
+    const price = distance ? Math.ceil(75 + (12.5 * (distance.value / 1000)) + 150) : 0;
+    response = resp({ result: { distance, price } }, 200);
   } catch (err) {
     console.log('err', err);
     response = resp({ message: err.message }, 400);

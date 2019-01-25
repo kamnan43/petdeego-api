@@ -27,10 +27,10 @@ export async function getDistance(origin, destination) {
   if (result && result.body && result.body.rows && result.body.rows.length) {
     const row = result.body.rows[0];
     if (row.elements && row.elements.length && row.elements[0].distance) {
-      return row.elements[0].distance.text;
+      return row.elements[0].distance;
     }
   }
-  return 'N/A';
+  return null;
 }
 
 export function toLatLngString(location) {
