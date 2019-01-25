@@ -154,7 +154,28 @@ export async function templateQuotation(order) {
                   },
                   {
                     type: 'text',
-                    text: `${order.date ? displayDatetime(order.date) : '-'}`,
+                    text: `${order.datetime ? displayDatetime(order.datetime) : '-'}`,
+                    flex: 5,
+                    size: 'sm',
+                    color: '#666666'
+                  }
+                ]
+              },
+              {
+                type: 'box',
+                layout: 'baseline',
+                spacing: 'sm',
+                contents: [
+                  {
+                    type: 'text',
+                    text: 'ยอดเงิน',
+                    flex: 2,
+                    size: 'sm',
+                    color: '#AAAAAA'
+                  },
+                  {
+                    type: 'text',
+                    text: `${order.price} บาท`,
                     flex: 5,
                     size: 'sm',
                     color: '#666666'
@@ -336,9 +357,9 @@ export async function templateQuotation(order) {
           {
             type: 'button',
             action: {
-              type: 'uri',
-              label: 'เสนอราคา',
-              uri: `line://app/1634629146-AdLp1mRP?order_id=${order._id}`,
+              type: 'postback',
+              label: 'รับงาน',
+              data: `ACCEPT_${order._id}`
             },
             color: '#00d5ca',
             height: 'sm',

@@ -20,7 +20,7 @@ async function sendOrderToDriver(order) {
 
   // console.log('order =====> ', order);
   // console.log('drivers ====> ', drivers);
-  order.date = setTimeToGMT(order.date);
+  order.datetime = setTimeToGMT(order.datetime);
   drivers.forEach(async (driver) => {
     const message = await templateQuotation(order);
 
