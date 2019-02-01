@@ -63,8 +63,8 @@ export class DriverManager {
   async getDriversByOrderCriteria(order, criteria: any = {}) {
     try {
       let db = di.get('db');
-      if (order.pet_type.includes('dog')) criteria.isDog = true;
-      if (order.pet_type.includes('cat')) criteria.isCat = true;
+      if (order.type_dog) criteria.isDog = true;
+      if (order.type_cat) criteria.isCat = true;
       let collection = db.collection('drivers');
       const data = await collection.find(criteria).toArray();
       return data;
