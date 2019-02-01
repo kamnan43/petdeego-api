@@ -5,6 +5,7 @@ import { manager } from '../manager/manager';
 import * as line from '../utils/line';
 import { di } from '../di';
 import { paymentTemplate } from '../template/payment';
+import { driverInfoTemplate } from '../template/driverInfo';
 import { pickUpTemplate } from '../template/pickup';
 import { confirmEndTemplate } from '../template/confirmEnd';
 import { setTimeToGMT } from '../utils/datetime';
@@ -97,11 +98,66 @@ export async function updateQuotationStatus(quotation_id, status) {
 	}
 }
 
+export async function driverAcceptJob(order_id, driver_id, replyToken) {
+	try {
+		// let db = di.get('db');
+		// let collection = db.collection('quotations');
+		const order = await manager.order.getOrderByCriteria({ _id: ObjectId(order_id) });
+		console.log('order', order);
+		const driver = await manager.driver.getDriverById(driver_id);
+		console.log('driver', driver);
+
+		if (!order.driver_id) {
+			order.driver_id = driver_id;
+			await manager.order.updateOrder(order._id, order);
+
+			// send driver info to customer
+			// order.date = setTimeToGMT(order.date);
+			const msg = await driverInfoTemplate(order, driver);
+			console.log('Driver Info', msg);
+			await line.pushMessage(order.customer.userId, [
+				{
+					type: 'text',
+					text: `มีผู้รับงานแล้ว นี่คือรายละเอียดคนขับของคุณ`,
+				},
+				msg
+			]
+			);
+
+			// send msg to selected driver
+			// await line.replyMessage(replyToken, {
+			// 	type: 'text',
+			// 	text: `ยินดีด้วย คุณได้รับงานนี้`,
+			// })
+
+			// // send msg to other driver
+			// const otherDrivers = await manager.driver.getDriversByCriteria({
+			// 	_id: { $ne: ObjectId(driver_id) }
+			// });
+
+			// otherDrivers.forEach(otherDriver => {
+			// 	line.pushMessage(otherDriver.user_id, {
+			// 		type: 'text',
+			// 		text: `รายการของคุณ [${order.customer.displayName}] ถูกยกเลิก เนื่องจากลูกค้าเลือกเรียกรถคนอื่นแล้ว`,
+			// 	});
+			// });
+		} else {
+			line.replyMessage(replyToken, {
+				type: 'text',
+				text: `ขออภัย รายการของคุณ [${order.customer.displayName}] มีผู้รับงานแล้ว`,
+			});
+		}
+	} catch (err) {
+		console.log('err', err);
+	}
+}
+
 async function handlePostback(message, event) {
 	console.log('handlePostback', event);
 	const postbackData = event.postback.data.split('_');
 	const action = postbackData[0];
 	const data = postbackData[1];
+	const extra = postbackData[2];
 	console.log('postbackData ===>', postbackData);
 	if (action === 'DROPOFF') {
 		let orderId = data;
@@ -144,6 +200,9 @@ async function handlePostback(message, event) {
 	} else if (action === 'BUY') {
 		updateQuotationStatus(data, 'accepted');
 		await line.replyMessage(event.replyToken, { type: 'text', text: 'ยืนยันนัดหมายแล้ว ขอบคุณค่ะ' });
+	} else if (action === 'ACCEPT') {
+		// updateQuotationStatus(data, 'accepted');
+		await line.replyMessage(event.replyToken, { type: 'text', text: 'ยืนยันนัดหมายแล้ว ขอบคุณค่ะ' });
 	}
 }
 
@@ -162,7 +221,7 @@ async function handleEvent(event) {
 		case 'postback':
 			await handlePostback(message, event); break;
 		default:
-			// throw new Error(`Unknown event: ${JSON.stringify(event)}`);
+		// throw new Error(`Unknown event: ${JSON.stringify(event)}`);
 	}
 }
 

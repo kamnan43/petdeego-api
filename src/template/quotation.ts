@@ -35,8 +35,9 @@ export async function templateQuotation(order) {
             contents: [
               {
                 type: 'text',
-                text: 'การเดินทางของคุณ (ทดสอบระบบ)',
-                size: 'xl'
+                // text: 'การเดินทางของคุณ (ทดสอบระบบ)',
+                text: '(ทดสอบระบบ)',
+                size: 'md'
               }
             ]
           }

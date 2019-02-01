@@ -48,4 +48,15 @@ export class DriverManager {
       throw new Error(err);
     }
   }
+
+  async getDriversByCriteria(criteria = {}) {
+    try {
+      let db = di.get('db');
+      let collection = db.collection('orders');
+      const data = await collection.find(criteria).toArray();
+      return data;
+    } catch (err) {
+      throw new Error(err);
+    }
+  }
 }

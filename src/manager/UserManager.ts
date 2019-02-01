@@ -15,7 +15,7 @@ export class UserManager {
     try {
       let db = di.get('db');
       let collection = db.collection('users');
-      let data = await collection.findOne(criteria).toArray();
+      let data = await collection.find(criteria).toArray();
       return data;
     } catch (err) {
       throw new Error(err);
