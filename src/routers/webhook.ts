@@ -352,6 +352,8 @@ async function driverIsPickedup(orderId, replyToken) {
 		await manager.order.updateOrderStatus(orderId, 'STARTED');
 		if (!order.owner) {
 			await line.pushMessage(order.customer.userId, { type: 'text', text: 'สัตว์เลี้ยงของคุณอยู่ระหว่างการเดินทาง' });
+		} else {
+			await line.pushMessage(order.customer.userId, { type: 'text', text: 'การเดินทางของคุณเริ่มต้นขึ้นแล้ว' });
 		}
 		if (order.payment === 'line') {
 			try {
@@ -394,7 +396,7 @@ async function driverIsFinished(orderId, replyToken) {
 			await manager.order.updateOrderStatus(orderId, 'FINISHED');
 			let order = await manager.order.getOrderByCriteria({ _id: ObjectId(orderId) });
 			if (order.owner) {
-				await line.pushMessage(order.customer.userId, { type: 'text', text: 'การเดินทางของคุณ เสร็จสมบูรณ์แล้ว ขอบคุณที่ใช้้บริการของเราค่ะ' });
+				await line.pushMessage(order.customer.userId, { type: 'text', text: 'การเดินทางของคุณ เสร็จสมบูรณ์แล้ว ขอบคุณที่ใช้บริการของเราค่ะ' });
 			} else {
 				await line.pushMessage(order.customer.userId, { type: 'text', text: 'สัตว์เลี้ยงของคุณส่งถึงจุดหมายแล้ว ขอบคุณที่ใช้้บริการของเราค่ะ' });
 			}
