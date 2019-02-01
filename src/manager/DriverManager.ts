@@ -52,7 +52,7 @@ export class DriverManager {
   async getDriversByCriteria(criteria = {}) {
     try {
       let db = di.get('db');
-      let collection = db.collection('orders');
+      let collection = db.collection('drivers');
       const data = await collection.find(criteria).toArray();
       return data;
     } catch (err) {

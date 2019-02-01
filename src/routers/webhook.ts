@@ -3,10 +3,11 @@ import * as rp from 'request-promise';
 import { config } from '../config';
 import { manager } from '../manager/manager';
 import * as line from '../utils/line';
-import { di } from '../di';
+// import { di } from '../di';
 import { paymentTemplate } from '../template/payment';
 import { driverInfoTemplate } from '../template/driverInfo';
-import { pickUpTemplate } from '../template/pickup';
+// import { pickUpTemplate } from '../template/pickup';
+import { templateQuotation } from '../template/quotation';
 import { confirmEndTemplate } from '../template/confirmEnd';
 import { setTimeToGMT } from '../utils/datetime';
 
@@ -144,8 +145,6 @@ async function driverAcceptJob(order_id, driver_id, replyToken) {
 
 async function customerRejectDriver(order_id, driver_id, replyToken) {
 	try {
-		// let db = di.get('db');
-		// let collection = db.collection('quotations');
 		const order = await manager.order.getOrderByCriteria({ _id: ObjectId(order_id) });
 		console.log('order', order);
 		const driver = await manager.driver.getDriverById(driver_id);
@@ -155,32 +154,76 @@ async function customerRejectDriver(order_id, driver_id, replyToken) {
 			order.driver_id = '';
 			await manager.order.updateOrder(order._id, order);
 
-			// send driver info to customer
-			const msg = await driverInfoTemplate(order, driver);
-			console.log('Driver Info', msg);
-			await line.replyMessage(replyToken, msg);
-
 			await line.replyMessage(replyToken, {
 				type: 'text',
 				text: `แจ้งยกเลิกคนขับ [${driver.name}] แล้ว เราจะหาคนขับคนอื่นให้ค่ะ กรุณารอสักครู่`,
 			})
 
 			// send msg to other driver
-			// const otherDrivers = await manager.driver.getDriversByCriteria({
-			// 	_id: { $ne: ObjectId(driver_id) }
-			// });
+			const otherDrivers = await manager.driver.getDriversByCriteria({
+				// _id: { $ne: ObjectId(driver_id) },
+				user_id: 'Uaf01b90203e594b4b43a69290acf68d7'
+			});
+			console.log('otherDrivers Info', otherDrivers);
 
-			// otherDrivers.forEach(otherDriver => {
-			// 	line.pushMessage(otherDriver.user_id, {
-			// 		type: 'text',
-			// 		text: `รายการของคุณ [${order.customer.displayName}] ถูกยกเลิก เนื่องจากลูกค้าเลือกเรียกรถคนอื่นแล้ว`,
-			// 	});
-			// });
+			otherDrivers.forEach(async otherDriver => {
+				const message = await templateQuotation(order, otherDriver);
+				line.pushMessage(otherDriver.user_id,
+					[
+						{
+							type: 'text',
+							text: `รายการของคุณ [${order.customer.displayName}] ขอปฏิเสธคนขับก่อนหน้านี้`,
+						},
+						message
+					]
+				);
+			});
 		} else {
 			line.replyMessage(replyToken, {
 				type: 'text',
 				text: `ขออภัย รายการของคุณ [${order.customer.displayName}] มีผู้รับงานแล้ว`,
 			});
+		}
+	} catch (err) {
+		console.log('err', err);
+	}
+}
+
+async function customerCancelOrder(order_id, replyToken) {
+	try {
+		const order = await manager.order.getOrderByCriteria({ _id: ObjectId(order_id) });
+		if (!order.driver_id) {
+			order.status = 'CANCELED';
+			await manager.order.updateOrder(order._id, order);
+			const driver = await manager.driver.getDriverById(order.driver_id);
+			line.pushMessage(driver.user_id,
+				{
+					type: 'text',
+					text: `รายการของคุณ [${order.customer.displayName}] ลูกค้าขอยกเลิก`,
+				},
+			);
+
+			await line.replyMessage(replyToken, {
+				type: 'text',
+				text: `แจ้งยกเลิกออร์เดอร์เรียบร้อยแล้ว เราหวังว่าจะมีโอกาสให้บริการในครั้งถัดไป ขอบคุณค่ะ`,
+			})
+		} else {
+			const drivers = await manager.driver.getDriversByCriteria({
+				// _id: { $ne: ObjectId(driver_id) },
+				user_id: 'Uaf01b90203e594b4b43a69290acf68d7'
+			});
+			drivers.forEach(async driver => {
+				line.pushMessage(driver.user_id,
+					{
+						type: 'text',
+						text: `รายการของคุณ [${order.customer.displayName}] ลูกค้าขอยกเลิก`,
+					},
+				);
+			});
+			await line.replyMessage(replyToken, {
+				type: 'text',
+				text: `แจ้งยกเลิกออร์เดอร์เรียบร้อยแล้ว เราหวังว่าจะมีโอกาสให้บริการในครั้งถัดไป ขอบคุณค่ะ`,
+			})
 		}
 	} catch (err) {
 		console.log('err', err);
@@ -239,6 +282,8 @@ async function handlePostback(message, event) {
 		driverAcceptJob(data, extra, event.replyToken);
 	} else if (action === 'REJECT') {
 		customerRejectDriver(data, extra, event.replyToken);
+	} else if (action === 'CANCEL') {
+		customerCancelOrder(data, event.replyToken);
 	}
 }
 
