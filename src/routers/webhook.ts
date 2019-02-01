@@ -104,17 +104,24 @@ async function driverAcceptJob(order_id, driver_id, replyToken) {
 		const order = await manager.order.getOrderByCriteria({ _id: ObjectId(order_id) });
 		const driver = await manager.driver.getDriverById(driver_id);
 
-		if (order.status === 'ACCEPTED' || order.driver_id) {
-			line.replyMessage(replyToken, {
-				type: 'text',
-				text: `ขออภัย รายการของคุณ [${order.customer.displayName}] มีผู้รับงานแล้ว`,
-			});
+		if (order.status === 'ACCEPTED' || order.status === 'STARTED') {
+			if (driver_id === order.driver_id) {
+				line.replyMessage(replyToken, {
+					type: 'text',
+					text: `ขออภัย รายการของคุณ [${order.customer.displayName}] คุณกดรับงานไปแล้ว`,
+				});
+			} else {
+				line.replyMessage(replyToken, {
+					type: 'text',
+					text: `ขออภัย รายการของคุณ [${order.customer.displayName}] มีผู้รับงานแล้ว`,
+				});
+			}
 		} else if (order.status === 'CANCELED') {
 			line.replyMessage(replyToken, {
 				type: 'text',
 				text: `ขออภัย รายการของคุณ [${order.customer.displayName}] ลูกค้าขอยกเลิกแล้ว`,
 			});
-		} else if (order.status === 'ENDED') {
+		} else if (order.status === 'FINISHED') {
 			line.replyMessage(replyToken, {
 				type: 'text',
 				text: `ขออภัย รายการของคุณ [${order.customer.displayName}] การเดินทางสิ้นสุดแล้ว`,
@@ -122,7 +129,7 @@ async function driverAcceptJob(order_id, driver_id, replyToken) {
 		} else if (!order.driver_id && order.status === 'CREATED') {
 			order.driver_id = driver_id;
 			order.status = 'ACCEPTED';
-			order.date = setTimeToGMT(order.date);
+			// order.date = setTimeToGMT(order.date);
 			await manager.order.updateOrder(order._id, order);
 
 			// send driver info to customer
@@ -156,29 +163,27 @@ async function driverAcceptJob(order_id, driver_id, replyToken) {
 async function customerRejectDriver(order_id, driver_id, replyToken) {
 	try {
 		const order = await manager.order.getOrderByCriteria({ _id: ObjectId(order_id) });
-		console.log('order', order);
 		const driver = await manager.driver.getDriverById(driver_id);
-		console.log('driver', driver);
 
-		if (order.status === 'CANCELED') {
+		if (order.status === 'CREATED' || order.status === 'CANCELED') {
 			line.replyMessage(replyToken, {
 				type: 'text',
-				text: `ขออภัย รายการของคุณ ถูกอยกเลิกแล้ว`,
+				text: `ขออภัย รายการของคุณ ถูกยกเลิกแล้ว`,
 			});
-		} else if (order.status === 'ENDED') {
+		} else if (order.status === 'FINISHED') {
 			line.replyMessage(replyToken, {
 				type: 'text',
 				text: `ขออภัย รายการของคุณ การเดินทางสิ้นสุดแล้ว`,
 			});
 		} else if (order.driver_id && order.status === 'ACCEPTED') {
-			order.driver_id = '';
-			order.status = 'CREATED';
-			await manager.order.updateOrder(order._id, order);
-
 			line.pushMessage(order.driver_id, {
 				type: 'text',
 				text: `รายการของคุณ [${order.customer.displayName}] ลูกค้าขอยกเลิกรายการของคุณ`,
 			});
+
+			order.driver_id = '';
+			order.status = 'CREATED';
+			await manager.order.updateOrder(order._id, order);
 
 			await line.replyMessage(replyToken, {
 				type: 'text',
@@ -190,7 +195,6 @@ async function customerRejectDriver(order_id, driver_id, replyToken) {
 				// _id: { $ne: ObjectId(driver_id) },
 				user_id: 'Uaf01b90203e594b4b43a69290acf68d7'
 			});
-			console.log('otherDrivers Info', otherDrivers);
 
 			otherDrivers.forEach(async otherDriver => {
 				const message = await templateQuotation(order, otherDriver);
@@ -210,23 +214,23 @@ async function customerRejectDriver(order_id, driver_id, replyToken) {
 	}
 }
 
-async function customerCancelOrder(order_id, replyToken) {
+async function customerCancelOrder(orderId, replyToken) {
 	try {
-		const order = await manager.order.getOrderByCriteria({ _id: ObjectId(order_id) });
-		
+		const order = await manager.order.getOrderByCriteria({ _id: ObjectId(orderId) });
+
 		if (order.status === 'CANCELED') {
 			line.replyMessage(replyToken, {
 				type: 'text',
 				text: `ขออภัย รายการของคุณ ถูกยกเลิกแล้ว`,
 			});
-		} else if (order.status === 'ENDED') {
+		} else if (order.status === 'FINISHED') {
 			line.replyMessage(replyToken, {
 				type: 'text',
 				text: `ขออภัย รายการของคุณ การเดินทางสิ้นสุดแล้ว`,
 			});
 		} else if (!order.driver_id) {
-			order.status = 'CANCELED';
-			await manager.order.updateOrder(order._id, order);
+			await manager.order.updateOrderStatus(orderId, 'CANCELED');
+
 			const driver = await manager.driver.getDriverById(order.driver_id);
 			line.pushMessage(driver.user_id,
 				{
@@ -286,9 +290,11 @@ async function driverIsGoing(order_id, replyToken) {
 	}
 }
 
-async function driverIsArrived(order_id, replyToken) {
+async function driverIsArrived(orderId, replyToken) {
 	try {
-		const order = await manager.order.getOrderByCriteria({ _id: ObjectId(order_id) });
+		await manager.order.updateOrderStatus(orderId, 'ARRIVED');
+
+		const order = await manager.order.getOrderByCriteria({ _id: ObjectId(orderId) });
 		console.log('order', order);
 
 		if (order.driver_id) {
@@ -311,7 +317,7 @@ async function driverIsArrived(order_id, replyToken) {
 }
 
 async function driverIsPickedup(orderId, replyToken) {
-	await manager.order.updateOrderStatus(orderId, 'pickedup');
+	await manager.order.updateOrderStatus(orderId, 'STARTED');
 
 	let order = await manager.order.getOrderByCriteria({ _id: ObjectId(orderId) });
 	let driver = await manager.driver.getDriverByUserId(order.driver_id);
@@ -333,26 +339,34 @@ async function driverIsPickedup(orderId, replyToken) {
 		}
 	}
 	order.date = setTimeToGMT(order.date);
-	await line.pushMessage(driver.user_id, confirmEndTemplate(order));
+	await line.replyMessage(replyToken, confirmEndTemplate(order));
+}
+
+async function driverIsFinished(orderId, replyToken) {
+	try {
+		await manager.order.updateOrderStatus(orderId, 'FINISHED');
+		let order = await manager.order.getOrderByCriteria({ _id: ObjectId(orderId) });
+		if (order.owner) {
+			await line.pushMessage(order.customer.userId, { type: 'text', text: 'การเดินทางของคุณ เสร็จสมบูรณ์แล้ว ขอบคุณที่ใช้้บริการของเราค่ะ' });
+		} else {
+			await line.pushMessage(order.customer.userId, { type: 'text', text: 'สัตว์เลี้ยงของคุณส่งถึงจุดหมายแล้ว ขอบคุณที่ใช้้บริการของเราค่ะ' });
+		}
+		line.replyMessage(replyToken, {
+			type: 'text',
+			text: `การเดินทางของคุณ เสร็จสมบูรณ์แล้ว เราขอขอบคุณจากใจ ที่มาร่วมให้บริการกับเรา`,
+		})
+	} catch (err) {
+		console.log('err', err);
+	}
 }
 
 async function handlePostback(message, event) {
-	console.log('handlePostback', event);
 	const postbackData = event.postback.data.split('_');
 	const action = postbackData[0];
 	const data = postbackData[1];
 	const extra = postbackData[2];
 	console.log('postbackData ===>', postbackData);
-	if (action === 'DROPOFF') {
-		let orderId = data;
-		await manager.order.updateOrderStatus(orderId, 'dropoff');
-		let order = await manager.order.getOrderByCriteria({ _id: ObjectId(orderId) });
-		if (order.owner) {
-			await line.pushMessage(order.customer.userId, { type: 'text', text: 'คนขับส่งสัตว์เลี้ยงของคุณถึงจุดหมายแล้ว' });
-		} else {
-			await line.pushMessage(order.customer.userId, { type: 'text', text: 'สัตว์เลี้ยงของคุณส่งถึงจุดหมายแล้ว' });
-		}
-	} else if (action === 'ACCEPT') {
+	if (action === 'ACCEPT') {
 		driverAcceptJob(data, extra, event.replyToken);
 	} else if (action === 'REJECT') {
 		customerRejectDriver(data, extra, event.replyToken);
@@ -364,11 +378,13 @@ async function handlePostback(message, event) {
 		driverIsArrived(data, event.replyToken);
 	} else if (action === 'PICKUP') {
 		driverIsPickedup(data, event.replyToken);
+	} else if (action === 'DROPOFF') {
+		driverIsFinished(data, event.replyToken);
 	}
 }
 
 async function handleEvent(event) {
-	console.log('handleEvent', event);
+	// console.log('handleEvent', event);
 	const message = event.message;
 	switch (event.type) {
 		// case 'message':
@@ -393,7 +409,7 @@ function handleWebhook(req, res) {
 	}
 	// handle events separately
 	Promise.all(req.body.events.map(async (event) => {
-		console.log('handleWebhook', event);
+		// console.log('handleWebhook', event);
 		// check verify webhook event
 		if (event.source.userId !== 'Udeadbeefdeadbeefdeadbeefdeadbeef') {
 			await handleEvent(event);
