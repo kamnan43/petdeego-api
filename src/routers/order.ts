@@ -17,7 +17,7 @@ router.get('/calculate/:from/:to', calculate);
 async function sendOrderToDriver(order) {
   const db = di.get('db');
   // const drivers = await db.collection('drivers').find({ user_id: 'Uaf01b90203e594b4b43a69290acf68d7' }).toArray();
-  const drivers = await db.collection('drivers').find({}).toArray();
+  const drivers = await manager.driver.getDriversByOrderCriteria(order);
 
   // console.log('order =====> ', order);
   // console.log('drivers ====> ', drivers);
