@@ -176,7 +176,7 @@ async function customerRejectDriver(order_id, driver_id, replyToken) {
 				text: `ขออภัย รายการของคุณ การเดินทางสิ้นสุดแล้ว`,
 			});
 		} else if (order.driver_id && order.status === 'ACCEPTED') {
-			line.pushMessage(order.driver_id, {
+			await line.pushMessage(order.driver_id, {
 				type: 'text',
 				text: `รายการของคุณ [${order.customer.displayName}] ลูกค้าขอยกเลิกรายการของคุณ`,
 			});
