@@ -1,7 +1,7 @@
 import { displayDatetime } from '../utils/datetime';
 import { getDirectionUrl, getDistance } from '../utils/googlemap';
 
-export async function templateQuotation(order) {
+export async function templateQuotation(order, driver) {
   let petType = 'อื่นๆ';
   if (order.pet_type && order.pet_type.length) {
     petType = order.pet_type.map(element => {
@@ -30,17 +30,16 @@ export async function templateQuotation(order) {
         margin: 'none',
         contents: [
           {
-            type: 'box',
-            layout: 'horizontal',
-            contents: [
-              {
-                type: 'text',
-                // text: 'การเดินทางของคุณ (ทดสอบระบบ)',
-                text: '(ทดสอบระบบ)',
-                size: 'md'
-              }
-            ]
-          }
+            type: 'text',
+            // text: 'การเดินทางของคุณ (ทดสอบระบบ)',
+            text: `(ทดสอบระบบ)`,
+            size: 'md'
+          },
+          {
+            type: 'text',
+            text: `จากคุณ [${order.name}]`,
+            size: 'md'
+          },
         ]
       },
       body: {
@@ -360,7 +359,7 @@ export async function templateQuotation(order) {
             action: {
               type: 'postback',
               label: 'รับงาน',
-              data: `ACCEPT_${order._id}`
+              data: `ACCEPT_${order._id}_${driver._id}`
             },
             color: '#00d5ca',
             height: 'sm',

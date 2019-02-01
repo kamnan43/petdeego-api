@@ -201,8 +201,7 @@ async function handlePostback(message, event) {
 		updateQuotationStatus(data, 'accepted');
 		await line.replyMessage(event.replyToken, { type: 'text', text: 'ยืนยันนัดหมายแล้ว ขอบคุณค่ะ' });
 	} else if (action === 'ACCEPT') {
-		// updateQuotationStatus(data, 'accepted');
-		await line.replyMessage(event.replyToken, { type: 'text', text: 'ยืนยันนัดหมายแล้ว ขอบคุณค่ะ' });
+		driverAcceptJob(data, extra, event.replyToken);
 	}
 }
 

@@ -22,13 +22,15 @@ async function sendOrderToDriver(order) {
   // console.log('drivers ====> ', drivers);
   order.datetime = setTimeToGMT(order.datetime);
   drivers.forEach(async (driver) => {
-    const message = await templateQuotation(order);
-    console.log('driver.user_id ===> ', driver.user_id);
-    console.log('message ===> ', JSON.stringify(message));
-    pushMessage(driver.user_id, message)
-      .catch((err) => {
-        console.log('err', err.originalError.response.data);
-      });
+    const message = await templateQuotation(order, driver);
+    // console.log('driver.user_id ===> ', driver.user_id);
+    // console.log('message ===> ', JSON.stringify(message));
+    if (driver.user_id) {
+      pushMessage(driver.user_id, message)
+        .catch((err) => {
+          console.log('err', err.originalError.response.data);
+        });
+    }
   });
   return drivers.length;
 }
