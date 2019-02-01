@@ -7,7 +7,7 @@ export async function pickUpTemplate(order) {
 
   let template = {
     type: 'flex',
-    altText: 'การเดินทางของคุณ',
+    altText: 'ยินดีด้วย คุณได้รับงานนี้',
     contents: {
       type: 'bubble',
       direction: 'ltr',
@@ -24,7 +24,7 @@ export async function pickUpTemplate(order) {
             contents: [
               {
                 type: 'text',
-                text: 'การเดินทางของคุณ',
+                text: 'ยินดีด้วย คุณได้รับงานนี้',
                 size: 'xl'
               }
             ]
@@ -262,7 +262,7 @@ export async function pickUpTemplate(order) {
       },
       footer: {
         type: 'box',
-        layout: 'horizontal',
+        layout: 'vertical',
         flex: 2,
         spacing: 'sm',
         contents: [
@@ -270,16 +270,34 @@ export async function pickUpTemplate(order) {
             type: 'button',
             action: {
               type: 'postback',
-              label: 'Pick Up',
-              data: `PICKUP_${order._id}`
+              label: 'กำลังจะไปรับ',
+              data: `GOING_${order._id}`
             },
             color: '#00d5ca',
             height: 'sm',
             style: 'primary'
           },
           {
-            type: 'spacer',
-            size: 'sm'
+            type: 'button',
+            action: {
+              type: 'postback',
+              label: 'มาถึงจุดรับแล้ว',
+              data: `ARRIVED_${order._id}`
+            },
+            color: '#00d5ca',
+            height: 'sm',
+            style: 'primary'
+          },
+          {
+            type: 'button',
+            action: {
+              type: 'postback',
+              label: 'เริ่มการเดินทาง',
+              data: `PICKUP_${order._id}`
+            },
+            color: '#00d5ca',
+            height: 'sm',
+            style: 'primary'
           }
         ]
       }

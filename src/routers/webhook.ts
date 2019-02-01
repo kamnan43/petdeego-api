@@ -115,11 +115,8 @@ async function driverAcceptJob(order_id, driver_id, replyToken) {
 			await line.pushMessage(order.customer.userId, msg);
 
 			// send msg to selected driver
-			const msg2 = await pickUpTemplate(order);
-			await line.replyMessage(replyToken, [{
-				type: 'text',
-				text: `ยินดีด้วย คุณได้รับงานนี้`,
-			}, msg2])
+			const orderInfo = await pickUpTemplate(order);
+			await line.replyMessage(replyToken, orderInfo)
 
 			// send msg to other driver
 			const otherDrivers = await manager.driver.getDriversByCriteria({
@@ -155,6 +152,11 @@ async function customerRejectDriver(order_id, driver_id, replyToken) {
 		if (order.driver_id) {
 			order.driver_id = '';
 			await manager.order.updateOrder(order._id, order);
+
+			line.pushMessage(order.driver_id, {
+				type: 'text',
+				text: `รายการของคุณ [${order.customer.displayName}] ลูกค้าขอยกเลิกรายการของคุณ`,
+			});
 
 			await line.replyMessage(replyToken, {
 				type: 'text',
@@ -227,6 +229,80 @@ async function customerCancelOrder(order_id, replyToken) {
 	}
 }
 
+async function driverIsGoing(order_id, replyToken) {
+	try {
+		const order = await manager.order.getOrderByCriteria({ _id: ObjectId(order_id) });
+		console.log('order', order);
+
+		if (order.driver_id) {
+			order.driver_id = '';
+			await manager.order.updateOrder(order._id, order);
+
+			line.pushMessage(order.user_id, {
+				type: 'text',
+				text: `คนขับกำลังเดินทางไปรับคุณ`,
+			});
+
+			line.replyMessage(replyToken, {
+				type: 'text',
+				text: `แจ้งลูกค้าแล้ว ว่าคุณกำลังเดินทางไปรับ`,
+			})
+		}
+	} catch (err) {
+		console.log('err', err);
+	}
+}
+
+async function driverIsArrived(order_id, replyToken) {
+	try {
+		const order = await manager.order.getOrderByCriteria({ _id: ObjectId(order_id) });
+		console.log('order', order);
+
+		if (order.driver_id) {
+			order.driver_id = '';
+			await manager.order.updateOrder(order._id, order);
+
+			line.pushMessage(order.user_id, {
+				type: 'text',
+				text: `คนขับของคุณมาถึงแล้ว`,
+			});
+
+			line.replyMessage(replyToken, {
+				type: 'text',
+				text: `แจ้งลูกค้าแล้ว ว่าคุณมาถึง`,
+			})
+		}
+	} catch (err) {
+		console.log('err', err);
+	}
+}
+
+async function driverIsPickedup(orderId, replyToken) {
+	await manager.order.updateOrderStatus(orderId, 'pickedup');
+
+	let order = await manager.order.getOrderByCriteria({ _id: ObjectId(orderId) });
+	let driver = await manager.driver.getDriverByUserId(order.driver_id);
+	if (!order.owner) {
+		await line.pushMessage(order.customer.userId, { type: 'text', text: 'สัตว์เลี้ยงของคุณอยู่ระหว่างการเดินทาง' });
+	}
+	if (order.payment === 'line') {
+		try {
+			const paymentRes = await reservePayment(order, driver);
+			const paymentUrl = paymentRes.info.paymentUrl.web;
+			// update payment transaction
+			order.transactionId = paymentRes.info.transactionId + '';
+			await manager.order.updateOrder(orderId, order);
+			const msg = paymentTemplate(order, driver, paymentUrl);
+			console.log('Payment msg', msg);
+			await line.pushMessage(order.customer.userId, msg);
+		} catch (err) {
+			console.log('reservePayment error', err);
+		}
+	}
+	order.date = setTimeToGMT(order.date);
+	await line.pushMessage(driver.user_id, confirmEndTemplate(order));
+}
+
 async function handlePostback(message, event) {
 	console.log('handlePostback', event);
 	const postbackData = event.postback.data.split('_');
@@ -243,44 +319,18 @@ async function handlePostback(message, event) {
 		} else {
 			await line.pushMessage(order.customer.userId, { type: 'text', text: 'สัตว์เลี้ยงของคุณส่งถึงจุดหมายแล้ว' });
 		}
-	} else if (action === 'PICKUP') {
-		let orderId = data;
-		await manager.order.updateOrderStatus(orderId, 'pickedup');
-		let order = await manager.order.getOrderByCriteria({ _id: ObjectId(orderId) });
-		let driver = await manager.driver.getDriverByUserId(order.driver_id);
-		if (order.owner) {
-			await line.pushMessage(order.customer.userId, { type: 'text', text: 'คนขับของคุณมาถึงจุดนัดหมายแล้ว' });
-		} else {
-			await line.pushMessage(order.customer.userId, { type: 'text', text: 'สัตว์เลี้ยงของคุณอยู่ระหว่างดำเนินการส่ง' });
-		}
-		if (order.payment === 'line') {
-			try {
-				const paymentRes = await reservePayment(order, driver);
-				const paymentUrl = paymentRes.info.paymentUrl.web;
-				// update payment transaction
-				order.transactionId = paymentRes.info.transactionId + '';
-				await manager.order.updateOrder(orderId, order);
-				const msg = paymentTemplate(order, driver, paymentUrl);
-				console.log('Payment msg', msg);
-				await line.pushMessage(order.customer.userId, msg);
-			} catch (err) {
-				console.log('reservePayment error', err);
-			}
-		}
-		order.date = setTimeToGMT(order.date);
-		await line.pushMessage(driver.user_id, confirmEndTemplate(order));
-		// } else if (action === 'NOTBUY') {
-		// 	// updateQuotationStatus(data, 'rejected');
-		// 	await line.replyMessage(event.replyToken, { type: 'text', text: 'แจ้งปฏิเสธคนขับแล้ว กรุณารอราคาจากคนขับคนอื่นๆ' });
-		// } else if (action === 'BUY') {
-		// 	// updateQuotationStatus(data, 'accepted');
-		// 	await line.replyMessage(event.replyToken, { type: 'text', text: 'ยืนยันนัดหมายแล้ว ขอบคุณค่ะ' });
 	} else if (action === 'ACCEPT') {
 		driverAcceptJob(data, extra, event.replyToken);
 	} else if (action === 'REJECT') {
 		customerRejectDriver(data, extra, event.replyToken);
 	} else if (action === 'CANCEL') {
 		customerCancelOrder(data, event.replyToken);
+	} else if (action === 'GOING') {
+		driverIsGoing(data, event.replyToken);
+	} else if (action === 'ARRIVED') {
+		driverIsArrived(data, event.replyToken);
+	} else if (action === 'PICKUP') {
+		driverIsPickedup(data, event.replyToken);
 	}
 }
 
