@@ -37,7 +37,7 @@ export async function templateQuotation(order, driver) {
           },
           {
             type: 'text',
-            text: `จากคุณ [${order.name}]`,
+            text: `จากคุณ [${order.customer.displayName}]`,
             size: 'md'
           },
         ]

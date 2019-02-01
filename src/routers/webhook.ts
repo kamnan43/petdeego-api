@@ -49,56 +49,99 @@ async function reservePayment(order, driver): Promise<any> {
 	});
 }
 
-export async function updateQuotationStatus(quotation_id, status) {
+// export async function updateQuotationStatus(quotation_id, status) {
+// 	try {
+// 		let db = di.get('db');
+// 		let collection = db.collection('quotations');
+
+// 		let quotation = await collection.findOne({ _id: ObjectId(quotation_id) });
+// 		if (quotation) {
+// 			manager.quotation.updateQuotationStatus(quotation_id, status);
+// 			const order = await manager.order.getOrderByCriteria({ _id: ObjectId(quotation.order_id) });
+// 			if (status === 'accepted') {
+// 				// update order
+// 				order.driver_id = quotation.user_id;
+// 				order.price = quotation.price;
+// 				await manager.order.updateOrder(order._id, order);
+
+// 				// send msg to selected driver
+// 				await line.pushMessage(quotation.user_id, {
+// 					type: 'text',
+// 					text: `ลูกค้า [${order.customer.displayName}] ได้เลือกข้อเสนอของคุณ`,
+// 				})
+// 				order.date = setTimeToGMT(order.date);
+// 				const msg = await pickUpTemplate(order);
+// 				console.log('pickUpTemplate', msg);
+// 				await line.pushMessage(quotation.user_id, msg);
+
+// 				// send msg to other driver
+// 				const otherQt = await collection.find({
+// 					order_id: quotation.order_id,
+// 					_id: { $ne: ObjectId(quotation_id) },
+// 				}).toArray();
+// 				otherQt.forEach(element => {
+// 					manager.quotation.updateQuotationStatus(element._id, 'rejected');
+// 					line.pushMessage(element.user_id, {
+// 						type: 'text',
+// 						text: `รายการของคุณ [${order.customer.displayName}] ถูกยกเลิก เนื่องจากลูกค้าเลือกเรียกรถคนอื่นแล้ว`,
+// 					});
+// 				});
+// 			} else {
+// 				line.pushMessage(quotation.user_id, {
+// 					type: 'text',
+// 					text: `รายการของคุณ [${order.customer.displayName}] ถูกยกเลิก เนื่องจากลูกค้าปฏิเสธข้อเสนอของคุณ`,
+// 				});
+// 			}
+// 		}
+// 	} catch (err) {
+// 		console.log('err', err);
+// 	}
+// }
+
+async function driverAcceptJob(order_id, driver_id, replyToken) {
 	try {
-		let db = di.get('db');
-		let collection = db.collection('quotations');
+		const order = await manager.order.getOrderByCriteria({ _id: ObjectId(order_id) });
+		const driver = await manager.driver.getDriverById(driver_id);
 
-		let quotation = await collection.findOne({ _id: ObjectId(quotation_id) });
-		if (quotation) {
-			manager.quotation.updateQuotationStatus(quotation_id, status);
-			const order = await manager.order.getOrderByCriteria({ _id: ObjectId(quotation.order_id) });
-			if (status === 'accepted') {
-				// update order
-				order.driver_id = quotation.user_id;
-				order.price = quotation.price;
-				await manager.order.updateOrder(order._id, order);
+		if (!order.driver_id) {
+			order.driver_id = driver_id;
+			await manager.order.updateOrder(order._id, order);
 
-				// send msg to selected driver
-				await line.pushMessage(quotation.user_id, {
+			// send driver info to customer
+			const msg = await driverInfoTemplate(order, driver);
+			console.log('Driver Info', msg);
+			await line.pushMessage(order.customer.userId, msg);
+
+			// send msg to selected driver
+			await line.replyMessage(replyToken, {
+				type: 'text',
+				text: `ยินดีด้วย คุณได้รับงานนี้`,
+			})
+
+			// send msg to other driver
+			const otherDrivers = await manager.driver.getDriversByCriteria({
+				// _id: { $ne: ObjectId(driver_id) },
+				user_id: 'Uaf01b90203e594b4b43a69290acf68d7'
+			});
+
+			otherDrivers.forEach(otherDriver => {
+				line.pushMessage(otherDriver.user_id, {
 					type: 'text',
-					text: `ลูกค้า [${order.customer.displayName}] ได้เลือกข้อเสนอของคุณ`,
-				})
-				order.date = setTimeToGMT(order.date);
-				const msg = await pickUpTemplate(order);
-				console.log('pickUpTemplate', msg);
-				await line.pushMessage(quotation.user_id, msg);
-
-				// send msg to other driver
-				const otherQt = await collection.find({
-					order_id: quotation.order_id,
-					_id: { $ne: ObjectId(quotation_id) },
-				}).toArray();
-				otherQt.forEach(element => {
-					manager.quotation.updateQuotationStatus(element._id, 'rejected');
-					line.pushMessage(element.user_id, {
-						type: 'text',
-						text: `รายการของคุณ [${order.customer.displayName}] ถูกยกเลิก เนื่องจากลูกค้าเลือกเรียกรถคนอื่นแล้ว`,
-					});
+					text: `ขออภัย รายการของคุณ [${order.customer.displayName}] มีผู้รับงานแล้ว`,
 				});
-			} else {
-				line.pushMessage(quotation.user_id, {
-					type: 'text',
-					text: `รายการของคุณ [${order.customer.displayName}] ถูกยกเลิก เนื่องจากลูกค้าปฏิเสธข้อเสนอของคุณ`,
-				});
-			}
+			});
+		} else {
+			line.replyMessage(replyToken, {
+				type: 'text',
+				text: `ขออภัย รายการของคุณ [${order.customer.displayName}] มีผู้รับงานแล้ว`,
+			});
 		}
 	} catch (err) {
 		console.log('err', err);
 	}
 }
 
-export async function driverAcceptJob(order_id, driver_id, replyToken) {
+async function customerRejectDriver(order_id, driver_id, replyToken) {
 	try {
 		// let db = di.get('db');
 		// let collection = db.collection('quotations');
@@ -108,29 +151,20 @@ export async function driverAcceptJob(order_id, driver_id, replyToken) {
 		console.log('driver', driver);
 
 		if (!order.driver_id) {
-			order.driver_id = driver_id;
+			order.driver_id = '';
 			await manager.order.updateOrder(order._id, order);
 
 			// send driver info to customer
-			// order.date = setTimeToGMT(order.date);
 			const msg = await driverInfoTemplate(order, driver);
 			console.log('Driver Info', msg);
-			await line.pushMessage(order.customer.userId, [
-				{
-					type: 'text',
-					text: `มีผู้รับงานแล้ว นี่คือรายละเอียดคนขับของคุณ`,
-				},
-				msg
-			]
-			);
+			await line.replyMessage(replyToken, msg);
 
-			// send msg to selected driver
-			// await line.replyMessage(replyToken, {
-			// 	type: 'text',
-			// 	text: `ยินดีด้วย คุณได้รับงานนี้`,
-			// })
+			await line.replyMessage(replyToken, {
+				type: 'text',
+				text: `แจ้งยกเลิกคนขับ [${driver.name}] แล้ว เราจะหาคนขับคนอื่นให้ค่ะ กรุณารอสักครู่`,
+			})
 
-			// // send msg to other driver
+			// send msg to other driver
 			// const otherDrivers = await manager.driver.getDriversByCriteria({
 			// 	_id: { $ne: ObjectId(driver_id) }
 			// });
@@ -195,13 +229,15 @@ async function handlePostback(message, event) {
 		order.date = setTimeToGMT(order.date);
 		await line.pushMessage(driver.user_id, confirmEndTemplate(order));
 	} else if (action === 'NOTBUY') {
-		updateQuotationStatus(data, 'rejected');
+		// updateQuotationStatus(data, 'rejected');
 		await line.replyMessage(event.replyToken, { type: 'text', text: 'แจ้งปฏิเสธคนขับแล้ว กรุณารอราคาจากคนขับคนอื่นๆ' });
 	} else if (action === 'BUY') {
-		updateQuotationStatus(data, 'accepted');
+		// updateQuotationStatus(data, 'accepted');
 		await line.replyMessage(event.replyToken, { type: 'text', text: 'ยืนยันนัดหมายแล้ว ขอบคุณค่ะ' });
 	} else if (action === 'ACCEPT') {
 		driverAcceptJob(data, extra, event.replyToken);
+	} else if (action === 'REJECT') {
+		customerRejectDriver(data, extra, event.replyToken);
 	}
 }
 

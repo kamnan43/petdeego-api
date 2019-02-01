@@ -1,16 +1,32 @@
 
-export function driverInfoTemplate (order, driver) {
+export function driverInfoTemplate(order, driver) {
   const template = {
     type: 'flex',
     altText: 'คนขับของคุณ',
     contents: {
       type: 'bubble',
+      header: {
+        type: 'box',
+        layout: 'vertical',
+        contents: [
+          {
+            type: 'text',
+            text: `เย่! มีผู้รับงานแล้ว`,
+            size: 'lg',
+          },
+          {
+            type: 'text',
+            text: `นี่คือรายละเอียดคนขับของคุณ`,
+            size: 'lg',
+          }
+        ]
+      },
       hero: {
         type: 'image',
         url: `${driver.image}`,
         size: 'full',
         aspectRatio: '20:13',
-        aspectMode: 'fit',
+        aspectMode: 'cover',
       },
       body: {
         type: 'box',
@@ -18,36 +34,46 @@ export function driverInfoTemplate (order, driver) {
         spacing: 'md',
         contents: [
           {
-            type: 'text',
-            text: `${driver.name}`,
-            size: 'lg',
-            weight: 'bold'
+            type: 'box',
+            layout: 'baseline',
+            contents: [
+              {
+                type: 'text',
+                text: `ชื่อ`,
+                flex: 1,
+                size: 'lg',
+              },
+              {
+                type: 'text',
+                text: `${driver.name}`,
+                flex: 3,
+                size: 'lg',
+                weight: 'bold'
+              }
+            ]
+          },
+          {
+            type: 'box',
+            layout: 'baseline',
+            contents: [
+              {
+                type: 'text',
+                text: `เบอร์ติดต่อ`,
+                flex: 1,
+                size: 'lg',
+              },
+              {
+                type: 'text',
+                text: `${driver.tel}`,
+                flex: 3,
+                size: 'lg',
+                weight: 'bold'
+              }
+            ]
           },
           {
             type: 'separator'
           },
-          {
-            type: 'box',
-            layout: 'vertical',
-            spacing: 'sm',
-            contents: [
-              {
-                type: 'box',
-                layout: 'baseline',
-                contents: [
-                  {
-                    type: 'text',
-                    text: `${order.price} บาท`,
-                    margin: 'sm',
-                    size: 'xxl',
-                    align: 'center',
-                    weight: 'bold',
-                    color: '#57B846'
-                  }
-                ]
-              }
-            ]
-          }
         ]
       },
       footer: {
@@ -62,8 +88,19 @@ export function driverInfoTemplate (order, driver) {
             type: 'button',
             action: {
               type: 'postback',
-              label: 'ยกเลิก',
-              data: `CANCEL${order._id}`
+              label: 'Reject This Driver',
+              data: `REJECT_${order._id}_${driver._id}`
+            },
+            color: '#808080',
+            margin: 'md',
+            style: 'primary'
+          },
+          {
+            type: 'button',
+            action: {
+              type: 'postback',
+              label: 'Cancel This Order',
+              data: `CANCEL_${order._id}`
             },
             color: '#808080',
             margin: 'md',
