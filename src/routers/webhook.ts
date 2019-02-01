@@ -150,7 +150,7 @@ async function customerRejectDriver(order_id, driver_id, replyToken) {
 		const driver = await manager.driver.getDriverById(driver_id);
 		console.log('driver', driver);
 
-		if (!order.driver_id) {
+		if (order.driver_id) {
 			order.driver_id = '';
 			await manager.order.updateOrder(order._id, order);
 
@@ -177,11 +177,6 @@ async function customerRejectDriver(order_id, driver_id, replyToken) {
 						message
 					]
 				);
-			});
-		} else {
-			line.replyMessage(replyToken, {
-				type: 'text',
-				text: `ขออภัย รายการของคุณ [${order.customer.displayName}] มีผู้รับงานแล้ว`,
 			});
 		}
 	} catch (err) {
