@@ -71,7 +71,6 @@ export function driverInfoTemplate(order, driver) {
               },
               {
                 type: 'icon',
-                flex: 1,
                 url: 'https://iconsplace.com/wp-content/uploads/_icons/000000/256/png/phone-icon-256.png',
               }
             ],
