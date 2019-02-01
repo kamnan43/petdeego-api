@@ -59,4 +59,17 @@ export class DriverManager {
       throw new Error(err);
     }
   }
+
+  async getDriversByOrderCriteria(order, criteria: any = {}) {
+    try {
+      let db = di.get('db');
+      if (order.pet_type.includes('dog')) criteria.isDog = true;
+      if (order.pet_type.includes('cat')) criteria.isCat = true;
+      let collection = db.collection('drivers');
+      const data = await collection.find(criteria).toArray();
+      return data;
+    } catch (err) {
+      throw new Error(err);
+    }
+  }
 }

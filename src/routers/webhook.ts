@@ -9,7 +9,7 @@ import { driverInfoTemplate } from '../template/driverInfo';
 import { pickUpTemplate } from '../template/pickup';
 import { templateQuotation } from '../template/quotation';
 import { confirmEndTemplate } from '../template/confirmEnd';
-import { setTimeToGMT } from '../utils/datetime';
+// import { setTimeToGMT } from '../utils/datetime';
 
 const { ObjectId } = require('mongodb');
 
@@ -134,7 +134,6 @@ async function driverAcceptJob(order_id, driver_id, replyToken) {
 
 			// send driver info to customer
 			const msg = await driverInfoTemplate(order, driver);
-			// console.log('Driver Info', msg);
 			await line.pushMessage(order.customer.userId, msg);
 
 			// send msg to selected driver
@@ -142,11 +141,10 @@ async function driverAcceptJob(order_id, driver_id, replyToken) {
 			await line.replyMessage(replyToken, orderInfo)
 
 			// send msg to other driver
-			const otherDrivers = await manager.driver.getDriversByCriteria({
-				// _id: { $ne: ObjectId(driver_id) },
-				user_id: 'Uaf01b90203e594b4b43a69290acf68d7'
+			const otherDrivers = await manager.driver.getDriversByOrderCriteria(order, {
+				_id: { $ne: ObjectId(driver_id) },
+				// user_id: 'Uaf01b90203e594b4b43a69290acf68d7'
 			});
-			console.log('otherDrivers Info', otherDrivers);
 
 			otherDrivers.forEach(otherDriver => {
 				line.pushMessage(otherDriver.user_id, {
@@ -191,9 +189,9 @@ async function customerRejectDriver(order_id, driver_id, replyToken) {
 			})
 
 			// send msg to other driver
-			const otherDrivers = await manager.driver.getDriversByCriteria({
-				// _id: { $ne: ObjectId(driver_id) },
-				user_id: 'Uaf01b90203e594b4b43a69290acf68d7'
+			const otherDrivers = await manager.driver.getDriversByOrderCriteria(order, {
+				_id: { $ne: ObjectId(driver_id) },
+				// user_id: 'Uaf01b90203e594b4b43a69290acf68d7'
 			});
 
 			otherDrivers.forEach(async otherDriver => {
@@ -242,10 +240,8 @@ async function customerCancelOrder(orderId, replyToken) {
 				text: `แจ้งยกเลิกออร์เดอร์เรียบร้อยแล้ว เราหวังว่าจะมีโอกาสให้บริการในครั้งถัดไป ขอบคุณค่ะ`,
 			})
 		} else {
-			const drivers = await manager.driver.getDriversByCriteria({
-				// _id: { $ne: ObjectId(driver_id) },
-				user_id: 'Uaf01b90203e594b4b43a69290acf68d7'
-			});
+			await manager.order.updateOrderStatus(orderId, 'CANCELED');
+			const drivers = await manager.driver.getDriversByOrderCriteria(order);
 			drivers.forEach(async driver => {
 				line.pushMessage(driver.user_id,
 					{
