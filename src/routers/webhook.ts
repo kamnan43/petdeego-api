@@ -104,8 +104,24 @@ async function driverAcceptJob(order_id, driver_id, replyToken) {
 		const order = await manager.order.getOrderByCriteria({ _id: ObjectId(order_id) });
 		const driver = await manager.driver.getDriverById(driver_id);
 
-		if (!order.driver_id) {
+		if (order.status === 'ACCEPTED' || order.driver_id) {
+			line.replyMessage(replyToken, {
+				type: 'text',
+				text: `ขออภัย รายการของคุณ [${order.customer.displayName}] มีผู้รับงานแล้ว`,
+			});
+		} else if (order.status === 'CANCELED') {
+			line.replyMessage(replyToken, {
+				type: 'text',
+				text: `ขออภัย รายการของคุณ [${order.customer.displayName}] ลูกค้าขอยกเลิกแล้ว`,
+			});
+		} else if (order.status === 'ENDED') {
+			line.replyMessage(replyToken, {
+				type: 'text',
+				text: `ขออภัย รายการของคุณ [${order.customer.displayName}] การเดินทางสิ้นสุดแล้ว`,
+			});
+		} else if (!order.driver_id && order.status === 'CREATED') {
 			order.driver_id = driver_id;
+			order.status = 'ACCEPTED';
 			order.date = setTimeToGMT(order.date);
 			await manager.order.updateOrder(order._id, order);
 
@@ -131,11 +147,6 @@ async function driverAcceptJob(order_id, driver_id, replyToken) {
 					text: `รายการของคุณ [${order.customer.displayName}] มีผู้รับงานแล้ว`,
 				});
 			});
-		} else {
-			line.replyMessage(replyToken, {
-				type: 'text',
-				text: `ขออภัย รายการของคุณ [${order.customer.displayName}] มีผู้รับงานแล้ว`,
-			});
 		}
 	} catch (err) {
 		console.log('err', err);
@@ -149,8 +160,19 @@ async function customerRejectDriver(order_id, driver_id, replyToken) {
 		const driver = await manager.driver.getDriverById(driver_id);
 		console.log('driver', driver);
 
-		if (order.driver_id) {
+		if (order.status === 'CANCELED') {
+			line.replyMessage(replyToken, {
+				type: 'text',
+				text: `ขออภัย รายการของคุณ ถูกอยกเลิกแล้ว`,
+			});
+		} else if (order.status === 'ENDED') {
+			line.replyMessage(replyToken, {
+				type: 'text',
+				text: `ขออภัย รายการของคุณ การเดินทางสิ้นสุดแล้ว`,
+			});
+		} else if (order.driver_id && order.status === 'ACCEPTED') {
 			order.driver_id = '';
+			order.status = 'CREATED';
 			await manager.order.updateOrder(order._id, order);
 
 			line.pushMessage(order.driver_id, {
@@ -191,7 +213,18 @@ async function customerRejectDriver(order_id, driver_id, replyToken) {
 async function customerCancelOrder(order_id, replyToken) {
 	try {
 		const order = await manager.order.getOrderByCriteria({ _id: ObjectId(order_id) });
-		if (!order.driver_id) {
+		
+		if (order.status === 'CANCELED') {
+			line.replyMessage(replyToken, {
+				type: 'text',
+				text: `ขออภัย รายการของคุณ ถูกยกเลิกแล้ว`,
+			});
+		} else if (order.status === 'ENDED') {
+			line.replyMessage(replyToken, {
+				type: 'text',
+				text: `ขออภัย รายการของคุณ การเดินทางสิ้นสุดแล้ว`,
+			});
+		} else if (!order.driver_id) {
 			order.status = 'CANCELED';
 			await manager.order.updateOrder(order._id, order);
 			const driver = await manager.driver.getDriverById(order.driver_id);
