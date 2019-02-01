@@ -163,7 +163,6 @@ async function driverAcceptJob(order_id, driver_id, replyToken) {
 async function customerRejectDriver(order_id, driver_id, replyToken) {
 	try {
 		const order = await manager.order.getOrderByCriteria({ _id: ObjectId(order_id) });
-		const driver = await manager.driver.getDriverById(driver_id);
 
 		if (order.status === 'CREATED' || order.status === 'CANCELED') {
 			line.replyMessage(replyToken, {
@@ -176,7 +175,8 @@ async function customerRejectDriver(order_id, driver_id, replyToken) {
 				text: `ขออภัย รายการของคุณ การเดินทางสิ้นสุดแล้ว`,
 			});
 		} else if (order.driver_id && order.status === 'ACCEPTED') {
-			await line.pushMessage(order.driver_id, {
+			const driver = await manager.driver.getDriverById(driver_id);
+			await line.pushMessage(driver.user_id, {
 				type: 'text',
 				text: `รายการของคุณ [${order.customer.displayName}] ลูกค้าขอยกเลิกรายการของคุณ`,
 			});
