@@ -98,7 +98,7 @@ export function driverInfoTemplate(order, driver) {
             type: 'button',
             action: {
               type: 'postback',
-              label: 'ปฏิเสธคนขับคนนี้',
+              label: 'ปฏิเสธคนขับ',
               data: `REJECT_${order._id}_${driver._id}`
             },
             color: '#808080',

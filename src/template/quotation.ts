@@ -19,13 +19,13 @@ export async function templateQuotation(order, driver) {
   let template = {
     type: 'flex',
     altText: '(ทดสอบระบบ)',
-    styles: {
-      header: {
-        backgroundColor: "#f4aa42"
-      },
-    },
     contents: {
       type: 'bubble',
+      styles: {
+        header: {
+          backgroundColor: '#f4aa42'
+        },
+      },
       header: {
         type: 'box',
         layout: 'vertical',
