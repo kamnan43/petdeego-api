@@ -19,9 +19,13 @@ export async function templateQuotation(order, driver) {
   let template = {
     type: 'flex',
     altText: '(ทดสอบระบบ)',
+    styles: {
+      header: {
+        backgroundColor: "#f4aa42"
+      },
+    },
     contents: {
       type: 'bubble',
-      direction: 'ltr',
       header: {
         type: 'box',
         layout: 'vertical',
@@ -33,12 +37,12 @@ export async function templateQuotation(order, driver) {
             type: 'text',
             // text: 'การเดินทางของคุณ (ทดสอบระบบ)',
             text: `(ทดสอบระบบ)`,
-            size: 'md'
+            size: 'lg',
           },
           {
             type: 'text',
             text: `จากคุณ [${order.customer.displayName}]`,
-            size: 'md'
+            size: 'lg',
           },
         ]
       },
@@ -46,9 +50,6 @@ export async function templateQuotation(order, driver) {
         type: 'box',
         layout: 'vertical',
         contents: [
-          {
-            type: 'separator'
-          },
           {
             type: 'box',
             layout: 'vertical',

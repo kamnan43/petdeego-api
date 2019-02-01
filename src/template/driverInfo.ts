@@ -46,7 +46,7 @@ export function driverInfoTemplate(order, driver) {
               {
                 type: 'text',
                 text: `${driver.name}`,
-                flex: 3,
+                flex: 2,
                 size: 'lg',
                 weight: 'bold'
               }
@@ -58,18 +58,28 @@ export function driverInfoTemplate(order, driver) {
             contents: [
               {
                 type: 'text',
-                text: `เบอร์ติดต่อ`,
+                text: `โทร`,
                 flex: 1,
                 size: 'lg',
               },
               {
                 type: 'text',
                 text: `${driver.tel}`,
-                flex: 3,
+                flex: 5,
                 size: 'lg',
                 weight: 'bold'
+              },
+              {
+                type: 'icon',
+                flex: 1,
+                url: 'https://iconsplace.com/wp-content/uploads/_icons/000000/256/png/phone-icon-256.png',
               }
-            ]
+            ],
+            action: {
+              type: 'uri',
+              label: 'โทร',
+              uri: `tel:${driver.tel}`,
+            },
           },
           {
             type: 'separator'
@@ -78,7 +88,7 @@ export function driverInfoTemplate(order, driver) {
       },
       footer: {
         type: 'box',
-        layout: 'horizontal',
+        layout: 'vertical',
         contents: [
           {
             type: 'spacer',
@@ -88,7 +98,7 @@ export function driverInfoTemplate(order, driver) {
             type: 'button',
             action: {
               type: 'postback',
-              label: 'Reject This Driver',
+              label: 'ปฏิเสธคนขับคนนี้',
               data: `REJECT_${order._id}_${driver._id}`
             },
             color: '#808080',
@@ -99,7 +109,7 @@ export function driverInfoTemplate(order, driver) {
             type: 'button',
             action: {
               type: 'postback',
-              label: 'Cancel This Order',
+              label: 'ยกเลิกออร์เดอร์',
               data: `CANCEL_${order._id}`
             },
             color: '#808080',
