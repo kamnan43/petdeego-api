@@ -6,7 +6,7 @@ import * as line from '../utils/line';
 // import { di } from '../di';
 import { paymentTemplate } from '../template/payment';
 import { driverInfoTemplate } from '../template/driverInfo';
-// import { pickUpTemplate } from '../template/pickup';
+import { pickUpTemplate } from '../template/pickup';
 import { templateQuotation } from '../template/quotation';
 import { confirmEndTemplate } from '../template/confirmEnd';
 import { setTimeToGMT } from '../utils/datetime';
@@ -106,6 +106,7 @@ async function driverAcceptJob(order_id, driver_id, replyToken) {
 
 		if (!order.driver_id) {
 			order.driver_id = driver_id;
+			order.date = setTimeToGMT(order.date);
 			await manager.order.updateOrder(order._id, order);
 
 			// send driver info to customer
@@ -114,10 +115,11 @@ async function driverAcceptJob(order_id, driver_id, replyToken) {
 			await line.pushMessage(order.customer.userId, msg);
 
 			// send msg to selected driver
-			await line.replyMessage(replyToken, {
+			const msg2 = await pickUpTemplate(order);
+			await line.replyMessage(replyToken, [{
 				type: 'text',
 				text: `ยินดีด้วย คุณได้รับงานนี้`,
-			})
+			}, msg2])
 
 			// send msg to other driver
 			const otherDrivers = await manager.driver.getDriversByCriteria({
@@ -267,12 +269,12 @@ async function handlePostback(message, event) {
 		}
 		order.date = setTimeToGMT(order.date);
 		await line.pushMessage(driver.user_id, confirmEndTemplate(order));
-	} else if (action === 'NOTBUY') {
-		// updateQuotationStatus(data, 'rejected');
-		await line.replyMessage(event.replyToken, { type: 'text', text: 'แจ้งปฏิเสธคนขับแล้ว กรุณารอราคาจากคนขับคนอื่นๆ' });
-	} else if (action === 'BUY') {
-		// updateQuotationStatus(data, 'accepted');
-		await line.replyMessage(event.replyToken, { type: 'text', text: 'ยืนยันนัดหมายแล้ว ขอบคุณค่ะ' });
+		// } else if (action === 'NOTBUY') {
+		// 	// updateQuotationStatus(data, 'rejected');
+		// 	await line.replyMessage(event.replyToken, { type: 'text', text: 'แจ้งปฏิเสธคนขับแล้ว กรุณารอราคาจากคนขับคนอื่นๆ' });
+		// } else if (action === 'BUY') {
+		// 	// updateQuotationStatus(data, 'accepted');
+		// 	await line.replyMessage(event.replyToken, { type: 'text', text: 'ยืนยันนัดหมายแล้ว ขอบคุณค่ะ' });
 	} else if (action === 'ACCEPT') {
 		driverAcceptJob(data, extra, event.replyToken);
 	} else if (action === 'REJECT') {
