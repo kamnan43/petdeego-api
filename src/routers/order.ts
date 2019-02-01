@@ -16,15 +16,15 @@ router.get('/calculate/:from/:to', calculate);
 
 async function sendOrderToDriver(order) {
   const db = di.get('db');
-  const drivers = await db.collection('drivers').find({}).toArray();
+  const drivers = await db.collection('drivers').find({ user_id: 'Uaf01b90203e594b4b43a69290acf68d7' }).toArray();
 
   // console.log('order =====> ', order);
   // console.log('drivers ====> ', drivers);
   order.datetime = setTimeToGMT(order.datetime);
   drivers.forEach(async (driver) => {
     const message = await templateQuotation(order);
-
-    // console.log('message ===> ', JSON.stringify(message));
+    console.log('driver.user_id ===> ', driver.user_id);
+    console.log('message ===> ', JSON.stringify(message));
     pushMessage(driver.user_id, message)
       .catch((err) => {
         console.log('err', err.originalError.response.data);
