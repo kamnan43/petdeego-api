@@ -46,7 +46,7 @@ export function driverInfoTemplate(order, driver) {
               {
                 type: 'text',
                 text: `${driver.name}`,
-                flex: 2,
+                flex: 6,
                 size: 'lg',
                 weight: 'bold'
               }
